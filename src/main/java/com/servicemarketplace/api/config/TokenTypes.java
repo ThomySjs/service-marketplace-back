@@ -2,14 +2,14 @@ package com.servicemarketplace.api.config;
 
 public enum TokenTypes {
     //Enum utilizado para centralizar los tipos de token y sus expiraciones.
-    SESSION("Session", 86400000),
-    CONFIRMATION("Confirmation", 1800000),
-    REVOKED("Revoked", 1);
+    SESSION("Session", 7200000L), //2 hs
+    CONFIRMATION("Confirmation", 1800000L), //30 mins
+    REFRESH("Refresh", 2629800000L); //1 mes
 
     private final String type;
-    private final Integer expTime;
+    private final Long expTime;
 
-    TokenTypes(String type, Integer expTime) {
+    TokenTypes(String type, Long expTime) {
         this.type = type;
         this.expTime = expTime;
     }
@@ -17,7 +17,7 @@ public enum TokenTypes {
     public String getType() {
         return type ;
     }
-    public Integer getExpTime() {
+    public Long getExpTime() {
         return expTime;
     }
 }
