@@ -3,16 +3,19 @@ package com.servicemarketplace.api.controllers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
+import com.servicemarketplace.api.dto.auth.TokenResponse;
 import com.servicemarketplace.api.services.AuthService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpHeaders;
 
 @RestController
 @RequestMapping("/auth")
@@ -29,5 +32,11 @@ public class AuthController {
         }
         return ResponseEntity.ok(response.message());
     }
+
+    @PostMapping("/refresh")
+	public ResponseEntity<TokenResponse> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authHeader) {
+		final TokenResponse token = authService.refresh(authHeader);
+		return ResponseEntity.ok(token);
+	}
 
 }

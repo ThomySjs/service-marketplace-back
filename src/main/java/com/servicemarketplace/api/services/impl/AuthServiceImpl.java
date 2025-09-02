@@ -9,13 +9,16 @@ import org.springframework.stereotype.Service;
 import com.servicemarketplace.api.config.JwtUtils;
 import com.servicemarketplace.api.config.TokenTypes;
 import com.servicemarketplace.api.config.CustomConfig.MailConfig;
+import com.servicemarketplace.api.domain.entities.RefreshToken;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
+import com.servicemarketplace.api.dto.auth.TokenResponse;
 import com.servicemarketplace.api.services.AuthService;
 import com.servicemarketplace.api.services.EmailService;
 
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,6 +31,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
     private final RouteService routeService;
     private final MailConfig mailConfig;
+    private final RefreshTokenServiceImpl refreshTokenServiceImpl;
+
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -54,6 +59,27 @@ public class AuthServiceImpl implements AuthService {
         }catch (Exception e) {
             return new RegisterResponse("error", "Hubo un error al agregar el usuario");
         }
+    }
+
+    @Override
+    public TokenResponse refresh(String authHeader) {
+        final String token = jwtUtils.parseJwtFromString(authHeader);
+        if (token == null || !jwtUtils.getTokenType(token).equals(TokenTypes.REFRESH.getType()) || refreshTokenServiceImpl.isRevoked(token)) {
+            throw new JwtException("Refresh token invalido");
+        }
+
+        //Obtiene el mail y revoca el token utilizado
+        String email = jwtUtils.getUserFromToken(token);
+        refreshTokenServiceImpl.revokeToken(token);
+
+        //Crea los tokens
+        RefreshToken refreshToken = refreshTokenServiceImpl.createToken(email);
+        if (refreshToken == null) {
+            throw new JwtException("Refresh token invalido");
+        }
+        String sessionToken = jwtUtils.generateSessionToken(email, refreshToken.getSession());
+
+        return new TokenResponse(sessionToken, refreshToken.getToken());
     }
 
 }
