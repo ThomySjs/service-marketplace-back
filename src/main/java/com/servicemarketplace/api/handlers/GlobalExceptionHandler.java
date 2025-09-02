@@ -8,6 +8,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.jsonwebtoken.JwtException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -29,5 +31,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleConstraintViolationException(MethodArgumentNotValidException e) {
         LOG.error("Manejando ConstraintViolationException: {}", e.getBindingResult().getFieldError().getDefaultMessage());
         return new ResponseEntity<>(e.getBindingResult().getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<String> handleJwtException(JwtException e) {
+        LOG.error("Manejando JwtException: {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }
