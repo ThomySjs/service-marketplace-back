@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
@@ -38,5 +39,10 @@ public class AuthController {
 		final TokenResponse token = authService.refresh(authHeader);
 		return ResponseEntity.ok(token);
 	}
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
+    }
 
 }

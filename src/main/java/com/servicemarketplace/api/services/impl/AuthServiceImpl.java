@@ -3,6 +3,8 @@ package com.servicemarketplace.api.services.impl;
 import java.util.Date;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +14,11 @@ import com.servicemarketplace.api.config.CustomConfig.MailConfig;
 import com.servicemarketplace.api.domain.entities.RefreshToken;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
+import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
+import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 import com.servicemarketplace.api.services.AuthService;
 import com.servicemarketplace.api.services.EmailService;
 
@@ -25,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final EmailService mailService;
     private final PasswordEncoder passwordEncoder;
@@ -78,6 +83,25 @@ public class AuthServiceImpl implements AuthService {
             throw new JwtException("Refresh token invalido");
         }
         String sessionToken = jwtUtils.generateSessionToken(email, refreshToken.getSession());
+
+        return new TokenResponse(sessionToken, refreshToken.getToken());
+    }
+
+    @Override
+    public TokenResponse login(LoginRequest request){
+        //Autentica al usuario y lo trae de la base de datos
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        var user = userRepository.findByEmail(request.email()).get();
+
+        //Verifica si el usuario confirmo su correo y si la opcion de correos esta habilitada (Solo para desarrollo)
+        if (!user.isVerified() && mailConfig.isEnabled()) {
+            mailService.sendConfirmationEmail(user.getEmail(), routeService.getAppUrl());
+            throw new UserNotVerifiedException("Correo electronico no confirmado.");
+        }
+
+        RefreshToken refreshToken = refreshTokenServiceImpl.createToken(user.getEmail());
+        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession());
+
 
         return new TokenResponse(sessionToken, refreshToken.getToken());
     }
