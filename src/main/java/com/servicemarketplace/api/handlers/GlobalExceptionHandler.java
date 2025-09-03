@@ -4,9 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.servicemarketplace.api.exceptions.auth.UserNotFoundException;
+import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 
 import io.jsonwebtoken.JwtException;
 
@@ -37,5 +41,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleJwtException(JwtException e) {
         LOG.error("Manejando JwtException: {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException e) {
+        LOG.error("Manejando BadCredentialsException: {}", e.getMessage());
+        return new ResponseEntity<>("Credenciales invalidas.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotVerifiedException.class)
+    public ResponseEntity<String> handleUserNotVerifiedException(UserNotVerifiedException e) {
+        LOG.error("Manejando UserNotVerifiedException: {}", e.getMessage());
+        return new ResponseEntity<>("Correo no confirmado, por favor verifica tu casilla de correos.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
+        LOG.error("Manejando UserNotFoundException: {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

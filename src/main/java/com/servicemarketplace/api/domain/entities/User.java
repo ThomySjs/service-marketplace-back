@@ -1,12 +1,13 @@
 package com.servicemarketplace.api.domain.entities;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,13 +35,17 @@ public class User {
     private String password;
     private String address;
     @Builder.Default
-    private final boolean verified = false;
+    private boolean verified = false;
     @Builder.Default
-    private final String role = Role.USER.name();
-    private Date createdAt;
+    private String role = Role.USER.name();
+    private LocalDateTime createdAt;
     private Long zoneId;
-    private String token;
     @Builder.Default
-    private final boolean deleted = false;
+    private boolean deleted = false;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

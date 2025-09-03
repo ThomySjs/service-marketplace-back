@@ -1,7 +1,6 @@
 package com.servicemarketplace.api.config;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,8 +20,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.servicemarketplace.api.domain.entities.User;
-import com.servicemarketplace.api.domain.repositories.UserRepository;
+import com.servicemarketplace.api.domain.entities.RefreshToken;
+import com.servicemarketplace.api.domain.repositories.RefreshTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +35,8 @@ public class SecurityConfig
 	private final AuthTokenFilter jwtAuthFilter;
 	private final AuthenticationProvider authenticationProvider;
     private final JwtUtils jwtUtils;
-    private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
@@ -77,22 +77,15 @@ public class SecurityConfig
 		return source;
 	}
 
-	private void logout(String token)
-	{
-		if (token == null) {
+	private void logout(String token){
+
+		if (token == null || !jwtUtils.getTokenType(token).equals(TokenTypes.REFRESH.getType())) {
 			throw new IllegalArgumentException("Invalid token");
 		}
 
-		final String username = jwtUtils.getUserFromToken(token);
-        final Optional<User> user = userRepository.findByName(username);
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException("Invalid user");
-        }
-
-        final User foundUser = user.get();
-        final String revokedToken = jwtUtils.generateToken(foundUser.getName(), TokenTypes.REVOKED);
-        foundUser.setToken(revokedToken);
-		userRepository.save(foundUser);
-		log.info("Logout exitoso, token: {}", revokedToken);
+		RefreshToken foundToken = refreshTokenRepository.findByToken(token);
+		foundToken.setRevoked(true);
+		refreshTokenRepository.save(foundToken);
+		log.info("Logout exitoso, token id: {}", foundToken.getId());
 	}
 }
