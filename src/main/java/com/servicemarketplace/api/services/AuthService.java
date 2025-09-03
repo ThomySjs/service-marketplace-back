@@ -11,4 +11,6 @@ public interface AuthService {
     TokenResponse refresh(String authHeader);
 
     TokenResponse login(LoginRequest request);
+
+    String verify(String token);
 }
