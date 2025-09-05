@@ -46,6 +46,7 @@ public class SecurityConfig
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(req ->
 						req.requestMatchers("/auth/**",
+										"/categories/all",
 										"/swagger-ui/**",
 										"/v3/api-docs/**",
 										"/swagger-ui.html",

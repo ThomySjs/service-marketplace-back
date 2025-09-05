@@ -1,5 +1,7 @@
 package com.servicemarketplace.api.services.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.servicemarketplace.api.domain.entities.Category;
@@ -35,4 +37,10 @@ public class CategoryServiceImpl implements CategoryService{
             savedCategory.getTitle(),
             savedCategory.getDescription());
     }
+
+    @Override
+    public List<CategoryResponse> getAll() {
+        return categoryRepository.findAllCustom();
+    }
+
 }
