@@ -9,4 +9,6 @@ public interface CategoryService {
     CategoryResponse create(CategoryRequest categoryRequest);
 
     List<CategoryResponse> getAll();
+
+    void deleteById(Long id);
 }
