@@ -2,6 +2,8 @@ package com.servicemarketplace.api.domain.entities;
 
 import java.time.LocalDateTime;
 
+import com.servicemarketplace.api.config.Roles;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,11 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-enum Role {
-    USER,
-    ADMIN
-}
 
 @Data
 @Builder
@@ -37,7 +34,7 @@ public class User {
     @Builder.Default
     private boolean verified = false;
     @Builder.Default
-    private String role = Role.USER.name();
+    private String role = Roles.USER.name();
     private LocalDateTime createdAt;
     private Long zoneId;
     @Builder.Default
