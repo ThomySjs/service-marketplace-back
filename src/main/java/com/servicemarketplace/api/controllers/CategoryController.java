@@ -2,10 +2,6 @@ package com.servicemarketplace.api.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.servicemarketplace.api.dto.CategoryRequest;
-import com.servicemarketplace.api.dto.CategoryResponse;
-import com.servicemarketplace.api.services.CategoryService;
-
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;

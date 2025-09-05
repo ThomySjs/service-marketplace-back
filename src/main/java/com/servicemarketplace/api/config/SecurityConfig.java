@@ -52,6 +52,8 @@ public class SecurityConfig
 										"/swagger-ui.html",
 										"/swagger-resources/**",
 										"/webjars/**").permitAll()
+								.requestMatchers("/categories/add")
+								.hasRole(Roles.ADMIN.name())
 								.anyRequest().authenticated()
 						)
 				.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
