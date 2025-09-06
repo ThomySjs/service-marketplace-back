@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.repositories.CategoryRepository;
-import com.servicemarketplace.api.dto.CategoryRequest;
-import com.servicemarketplace.api.dto.CategoryResponse;
+import com.servicemarketplace.api.dto.CategoryDTO;
+import com.servicemarketplace.api.exceptions.auth.CategoryNotFoundException;
 import com.servicemarketplace.api.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;

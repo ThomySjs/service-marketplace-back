@@ -2,13 +2,12 @@ package com.servicemarketplace.api.services;
 
 import java.util.List;
 
-import com.servicemarketplace.api.dto.CategoryRequest;
-import com.servicemarketplace.api.dto.CategoryResponse;
+import com.servicemarketplace.api.dto.CategoryDTO;
 
 public interface CategoryService {
-    CategoryResponse create(CategoryRequest categoryRequest);
+    CategoryDTO create(CategoryDTO categoryRequest);
 
-    List<CategoryResponse> getAll();
+    List<CategoryDTO> getAll();
 
     void deleteById(Long id);
 }

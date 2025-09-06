@@ -2,8 +2,7 @@ package com.servicemarketplace.api.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.servicemarketplace.api.dto.CategoryRequest;
-import com.servicemarketplace.api.dto.CategoryResponse;
+import com.servicemarketplace.api.dto.CategoryDTO;
 import com.servicemarketplace.api.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,12 +29,12 @@ public class CategoryController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@Validated @RequestBody CategoryRequest request) {
+    public ResponseEntity<CategoryDTO> createCategory(@Validated @RequestBody CategoryDTO request) {
         return ResponseEntity.ok(categoryService.create(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
