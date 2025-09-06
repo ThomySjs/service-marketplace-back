@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.servicemarketplace.api.domain.entities.Category;
@@ -20,7 +21,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
        "ORDER BY c.title")
     List<CategoryDTO> findAllNotDeleted();
 
-    @Query("SELECT c FROM Category c WHERE c.id = :id AND c.deleted = false")
-    Optional<Category> findByIdNotDeleted(Long id);
+    @Query("SELECT c FROM categories c WHERE c.id = :id AND c.deleted = false")
+    Optional<Category> findByIdNotDeleted(@Param("id") Long id);
 
 }
