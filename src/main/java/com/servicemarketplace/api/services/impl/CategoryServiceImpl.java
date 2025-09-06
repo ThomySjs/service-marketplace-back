@@ -51,7 +51,18 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public void deleteById(Long id){
-        categoryRepository.deleteById(id);
+        if (id == null) {
+            throw new IllegalArgumentException("La id no puede ser nula");
+        }
+
+        Optional<Category> foundCategory = categoryRepository.findByIdNotDeleted(id);
+        if (foundCategory.isEmpty()) {
+            throw new CategoryNotFoundException("La categoria no existe.");
+        }
+
+        Category category = foundCategory.get();
+        category.setDeleted(true);
+        categoryRepository.save(category);
     }
 
     @Override
