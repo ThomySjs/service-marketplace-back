@@ -46,13 +46,12 @@ public class SecurityConfig
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(req ->
 						req.requestMatchers("/auth/**",
+										"/categories/**",
 										"/swagger-ui/**",
 										"/v3/api-docs/**",
 										"/swagger-ui.html",
 										"/swagger-resources/**",
 										"/webjars/**").permitAll()
-								.requestMatchers("/categories/add")
-								.hasRole(Roles.ADMIN.name())
 								.anyRequest().authenticated()
 						)
 				.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
