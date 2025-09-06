@@ -1,6 +1,7 @@
 package com.servicemarketplace.api.domain.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,9 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
        "FROM categories c " +
        "WHERE c.deleted = false " +
        "ORDER BY c.title")
-    List<CategoryResponse> findAllCustom();
+    List<CategoryDTO> findAllNotDeleted();
+
+    @Query("SELECT c FROM Category c WHERE c.id = :id AND c.deleted = false")
+    Optional<Category> findByIdNotDeleted(Long id);
+
 }

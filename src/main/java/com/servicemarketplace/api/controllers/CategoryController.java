@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -43,6 +45,12 @@ public class CategoryController {
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping
+    public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryRequest) {
+        return ResponseEntity.ok(categoryService.update(categoryRequest));
     }
 
 }

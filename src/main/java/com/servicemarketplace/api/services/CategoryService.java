@@ -10,4 +10,6 @@ public interface CategoryService {
     List<CategoryDTO> getAll();
 
     void deleteById(Long id);
+
+    CategoryDTO update(CategoryDTO categoryRequest);
 }
