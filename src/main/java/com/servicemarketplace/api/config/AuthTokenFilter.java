@@ -17,36 +17,46 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+
 @Component
 @RequiredArgsConstructor
-public class AuthTokenFilter extends OncePerRequestFilter {
+public class AuthTokenFilter extends OncePerRequestFilter
+{
 
-    private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
+	private final JwtUtils jwtUtils;
+	private final UserDetailsService userDetailsService;
 
-    @Override
-    protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain)
-        throws ServletException, IOException
-    {
-        try {
-            String jwt = jwtUtils.parseJwt(request);
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException
+	{
+		try
+		{
+			if (request.getServletPath().contains("/auth"))
+			{
+				filterChain.doFilter(request, response);
+				return;
+			}
 
-            if (jwt != null && jwtUtils.validateToken(jwt) && jwtUtils.validateSession(jwt)) {
-                String username = jwtUtils.getUserFromToken(jwt);
+			String jwt = jwtUtils.parseJwt(request);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    final var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
-            }
-            filterChain.doFilter(request, response);
-        }catch (UsernameNotFoundException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuario no encontrado");
-        }
-    }
- }
+			if (jwt != null && jwtUtils.validateToken(jwt) && jwtUtils.validateSession(jwt))
+			{
+				String username = jwtUtils.getUserFromToken(jwt);
+
+				if (username != null && SecurityContextHolder.getContext().getAuthentication() == null)
+				{
+					UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+					final var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authToken);
+				}
+			}
+			filterChain.doFilter(request, response);
+		}
+		catch (UsernameNotFoundException e)
+		{
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuario no encontrado");
+		}
+	}
+}
