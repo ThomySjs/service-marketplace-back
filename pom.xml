@@ -9,9 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.servicemarketplace</groupId>
-	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api</name>
 	<artifactId>service-marketplace-back</artifactId>
 	<name>service-marketplace-back</name>
 	<description>REST api for a service marketplace</description>
@@ -122,7 +120,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-	</dependencies>
+	
+   <dependency>
+     <groupId>javax</groupId>
+     <artifactId>javaee-api</artifactId>
+     <version>8.0.1</version>
+   </dependency>
+ </dependencies>
 
 	<build>
 		<plugins>
