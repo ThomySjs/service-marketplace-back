@@ -1,6 +1,7 @@
 package com.servicemarketplace.api.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,11 @@ import com.servicemarketplace.api.services.AuthService;
 import org.springframework.ui.Model;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 
@@ -56,4 +62,19 @@ public class AuthController {
         return "email-confirmation";
     }
 
+	@GetMapping("/info")
+	public Map<String, Object> getPodInfo() throws UnknownHostException
+	{
+		Map<String, Object> info = new HashMap<>();
+
+		// Nombre del Pod (hostname)
+		String podName = InetAddress.getLocalHost().getHostName();
+		info.put("podName", podName);
+
+		// Variables de entorno
+		Map<String, String> env = System.getenv();
+		info.put("environmentVariables", env);
+
+		return info;
+	}
 }
