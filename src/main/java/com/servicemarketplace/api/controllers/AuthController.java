@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 
-@RestController
+@Controller
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
