@@ -22,15 +22,20 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDTO getAccountDetails() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
+    public User getUserByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isEmpty()) {
             throw new UserNotFoundException("Usuario invalido.");
         }
-        User user = foundUser.get();
+        return foundUser.get();
+    }
+
+    @Override
+    public UserDTO getAccountDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = getUserByEmail(email);
 
         return UserMapper.toUserDTO(user);
     }
