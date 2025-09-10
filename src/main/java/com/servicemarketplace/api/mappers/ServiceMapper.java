@@ -1,7 +1,7 @@
 package com.servicemarketplace.api.mappers;
 
 import com.servicemarketplace.api.domain.entities.Service;
-import com.servicemarketplace.api.dto.ServiceDTO;
+import com.servicemarketplace.api.dto.service.ServiceDTO;
 
 public class ServiceMapper {
 

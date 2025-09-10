@@ -1,4 +1,4 @@
-package com.servicemarketplace.api.dto;
+package com.servicemarketplace.api.dto.service;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
