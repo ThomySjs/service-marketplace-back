@@ -31,6 +31,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long id) {
+        Optional<User> foundUser = userRepository.findById(id);
+        if (foundUser.isEmpty()) {
+            throw new UserNotFoundException("Usuario invalido.");
+        }
+        return foundUser.get();
+    }
+
+    @Override
     public UserDTO getAccountDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
