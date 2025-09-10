@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -53,7 +54,8 @@ public class SecurityConfig
 										"/swagger-resources/**",
 										"/actuator/**",
 										"/webjars/**").permitAll()
-								.anyRequest().authenticated()
+						.requestMatchers(HttpMethod.GET, "/services").permitAll()
+						.anyRequest().authenticated()
 						)
 				.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
