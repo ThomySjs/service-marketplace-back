@@ -29,6 +29,8 @@ public class Service {
     @Column(nullable = false)
     private String title;
     private String description;
+    @Column(name = "image_path")
+    private String imagePath;
     @Column(nullable = false)
     @Builder.Default
     private Double price = 0.0;
