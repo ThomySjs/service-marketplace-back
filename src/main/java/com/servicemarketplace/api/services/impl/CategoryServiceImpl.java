@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.repositories.CategoryRepository;
 import com.servicemarketplace.api.dto.CategoryDTO;
-import com.servicemarketplace.api.exceptions.auth.CategoryNotFoundException;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService{
     public Category getCategoryById(Long id) {
         Optional<Category> foundCategory = categoryRepository.findByIdNotDeleted(id);
         if (foundCategory.isEmpty()) {
-            throw new CategoryNotFoundException("La categoria no existe.");
+            throw new ResourceNotFoundException("La categoria no existe.");
         }
 
         return foundCategory.get();
