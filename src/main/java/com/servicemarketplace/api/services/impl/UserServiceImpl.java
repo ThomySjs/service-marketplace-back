@@ -22,6 +22,15 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    public User getUserFromContext() {
+        //Obtiene el mail del contexto
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        return getUserByEmail(email);
+    }
+
+    @Override
     public User getUserByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isEmpty()) {

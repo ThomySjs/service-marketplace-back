@@ -31,11 +31,8 @@ public class ServiceServiceImpl implements ServiceService{
 
     @Override
     public ServiceCreatedDTO create(ServiceDTO request){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-
         //Obtener el usuario
-        User user = userService.getUserByEmail(email);
+        User user = userService.getUserFromContext();
 
         //Obtener la categoria
         Category category = categoryService.getCategoryById(request.categoryId());
