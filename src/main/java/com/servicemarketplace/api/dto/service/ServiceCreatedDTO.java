@@ -9,10 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ServiceListResponse {
+public class ServiceCreatedDTO {
     private Long id;
-    private String category;
+    private Long categoryId;
+    private Long sellerId;
     private String image;
     private String title;
+    private String description;
     private Double price;
 }
+

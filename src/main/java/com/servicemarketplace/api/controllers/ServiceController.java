@@ -2,6 +2,7 @@ package com.servicemarketplace.api.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
 import com.servicemarketplace.api.services.ServiceService;
@@ -11,11 +12,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -27,8 +29,8 @@ public class ServiceController {
 
     private final ServiceService serviceService;
 
-    @PostMapping()
-    public ResponseEntity<ServiceDTO> createService(@RequestBody ServiceDTO request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ServiceCreatedDTO> createService(@ModelAttribute ServiceDTO request) {
         return ResponseEntity.ok(serviceService.create(request));
     }
 

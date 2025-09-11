@@ -18,6 +18,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
               s.id,
               s.category.title,
+              s.imagePath,
               s.title,
               s.price)
               FROM Service s
@@ -30,6 +31,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
               s.id,
               s.category.title,
+              s.imagePath,
               s.title,
               s.price)
               FROM Service s
@@ -42,6 +44,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
               s.id,
               s.category.title,
+              s.imagePath,
               s.title,
               s.price)
               FROM Service s
