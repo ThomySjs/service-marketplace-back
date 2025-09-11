@@ -1,9 +1,7 @@
 package com.servicemarketplace.api.services.impl;
 
 import java.util.List;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Optional;
 
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.entities.Service;
@@ -12,6 +10,8 @@ import com.servicemarketplace.api.domain.repositories.ServiceRepository;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.exceptions.auth.InvalidOperationException;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.mappers.ServiceMapper;
 import com.servicemarketplace.api.services.CategoryService;
 import com.servicemarketplace.api.services.ImageService;
@@ -70,5 +70,37 @@ public class ServiceServiceImpl implements ServiceService{
     @Override
     public List<ServiceListResponse> getAllNotDeleted() {
         return serviceRepository.findAllNotDeleted();
+    }
+
+    @Override
+    public Service getByIdNotDeleted(Long id) {
+        Optional<Service> service = serviceRepository.findByIdAndDeletedFalse(id);
+        if (service.isEmpty()) {
+            throw new ResourceNotFoundException("El servicio no existe.");
+        }
+
+        return service.get();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        //Obtiene el servicio
+        Service service = getByIdNotDeleted(id);
+
+        //Obtiene el usuario desde el contexto
+        User user = userService.getUserFromContext();
+
+        /*
+            Verifica si el usuario NO es el creador del servicio y NO es admin
+            - Permite que los administradores puedan dar de baja un servicio
+            - Evita que un usuario pueda borrar un servicio de otro usuario
+        */
+        if (!service.getSeller().getId().equals(user.getId()) && !user.isAdmin()) {
+            throw new InvalidOperationException("No tienes permisos para realizar esta accion.");
+        }
+
+        //Elimina el servicio (borrado logico)
+        service.setDeleted(true);
+        serviceRepository.save(service);
     }
 }
