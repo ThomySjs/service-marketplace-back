@@ -19,5 +19,9 @@ public interface ServiceService {
 
     List<ServiceListResponse> getAllNotDeleted();
 
+    void validateServiceOwner(Service service);
+
     void deleteById(Long id);
+
+    ServiceCreatedDTO update(ServiceDTO request);
 }

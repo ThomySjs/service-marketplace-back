@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
-
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,6 +54,11 @@ public class ServiceController {
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         serviceService.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ServiceCreatedDTO> updateService(@ModelAttribute ServiceDTO request) {
+        return ResponseEntity.ok(serviceService.update(request));
     }
 
 }

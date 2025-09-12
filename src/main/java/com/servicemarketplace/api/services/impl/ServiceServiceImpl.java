@@ -74,6 +74,9 @@ public class ServiceServiceImpl implements ServiceService{
 
     @Override
     public Service getByIdNotDeleted(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("La id del servicio no puede ser nula.");
+        }
         Optional<Service> service = serviceRepository.findByIdAndDeletedFalse(id);
         if (service.isEmpty()) {
             throw new ResourceNotFoundException("El servicio no existe.");
@@ -82,25 +85,73 @@ public class ServiceServiceImpl implements ServiceService{
         return service.get();
     }
 
+    /**
+     * Verifica si el usuario NO es el creador del servicio y NO es admin.
+     *
+     * <ul>
+     *   <li>Permite que los administradores puedan dar de baja un servicio.</li>
+     *   <li>Evita que un usuario pueda borrar un servicio de otro usuario.</li>
+     * </ul>
+     *
+     * @param service
+     */
+    @Override
+    public void validateServiceOwner(Service service) {
+        //Obtiene el usuario desde el contexto
+        User user = userService.getUserFromContext();
+
+        if (!service.getSeller().getId().equals(user.getId()) && !user.isAdmin()) {
+            throw new InvalidOperationException("No tienes permisos para realizar esta accion.");
+        }
+    }
+
     @Override
     public void deleteById(Long id) {
         //Obtiene el servicio
         Service service = getByIdNotDeleted(id);
 
-        //Obtiene el usuario desde el contexto
-        User user = userService.getUserFromContext();
-
-        /*
-            Verifica si el usuario NO es el creador del servicio y NO es admin
-            - Permite que los administradores puedan dar de baja un servicio
-            - Evita que un usuario pueda borrar un servicio de otro usuario
-        */
-        if (!service.getSeller().getId().equals(user.getId()) && !user.isAdmin()) {
-            throw new InvalidOperationException("No tienes permisos para realizar esta accion.");
-        }
+        //Validar que el usuario es el creador del servicio
+        validateServiceOwner(service);
 
         //Elimina el servicio (borrado logico)
         service.setDeleted(true);
         serviceRepository.save(service);
+
+        //Elimina la imagen de cloudinary
+        imageService.delete(service.getImagePath());
+    }
+
+    @Override
+    public ServiceCreatedDTO update(ServiceDTO request) {
+        //Obtiene el servicio
+        Service service = getByIdNotDeleted(request.id());
+
+        //Valida que el usuario es el creador del servicio
+        validateServiceOwner(service);
+
+        //Verifica si el usuario cambio la categoria del servicio
+        if (!request.categoryId().equals(service.getCategory().getId())) {
+            Category newCategory = categoryService.getCategoryById(request.categoryId());
+            service.setCategory(newCategory);
+        }
+
+        //Verifica si el usuario subio una imagen nueva
+        if (request.image() != null) {
+            //Carga la imagen nueva
+            String newImage = imageService.upload(request.image());
+
+            //Si el servicio tiene una imagen previa, la borra
+            if (service.getImagePath() != null) {
+                imageService.delete(service.getImagePath());
+            }
+
+            service.setImagePath(newImage);
+        }
+
+        service.setTitle(request.title());
+        service.setDescription(request.description());
+        service.setPrice(request.price());
+
+        return ServiceMapper.toServiceCreatedDTO(serviceRepository.save(service));
     }
 }

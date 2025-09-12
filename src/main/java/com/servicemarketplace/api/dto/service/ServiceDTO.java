@@ -11,7 +11,6 @@ public record ServiceDTO(
     Long id,
     @NotBlank(message = "El servicio debe pertenecer a una categoria.")
     Long categoryId,
-    Long sellerId,
     MultipartFile image,
     @NotBlank(message = "El servicio debe tener un titulo.")
     @Size(min = 10, message = "El titulo debe tener al menos 10 caracteres.")

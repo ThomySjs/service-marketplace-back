@@ -51,4 +51,44 @@ public class ImageServiceImpl implements ImageService{
             return null;
         }
     }
+
+    @Override
+    public void delete(String imagePath) {
+        //Crea el cliente de cloudinary
+        Cloudinary cloudinary = new Cloudinary(imageConfig.getUrl());
+
+        /*
+        Previene que la imagen siga siendo accesible desde el cache de cloudinary
+        despues de ser borrda
+        */
+        Map params = ObjectUtils.asMap(
+            "invalidate", true
+        );
+        try {
+            String imageName = parseImagePath(imagePath);
+            // Elimina la imagen
+            cloudinary.uploader().destroy(imageName, params);
+        }
+        catch (IOException e) {
+            System.out.println("Ocurrio un error al borrar la imagen: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Parsea el link de cloudinary para obtener el nombre de la imagen
+     *
+     * @return String - Nombre de la imagen
+     */
+    @Override
+    public String parseImagePath(String imagePath) {
+        // Corta desde /upload/ hasta el final
+        String withoutUpload = imagePath.substring(imagePath.indexOf("/upload/") + 8);
+
+        // Quita la parte de versión si existe (v + números + /)
+        withoutUpload = withoutUpload.replaceFirst("^v[0-9]+/", "");
+
+        // Quita extensión
+        return withoutUpload.replaceFirst("\\.[^.]+$", "");
+    }
 }
