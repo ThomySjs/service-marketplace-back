@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
+import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
 import com.servicemarketplace.api.services.ServiceService;
 
@@ -49,6 +50,12 @@ public class ServiceController {
 
         return ResponseEntity.ok(serviceService.getAllNotDeleted());
     }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<ServiceDetailsResponse> getServiceDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(serviceService.getServiceDetails(id));
+    }
+
 
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {

@@ -9,6 +9,7 @@ import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.ServiceRepository;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
+import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
 import com.servicemarketplace.api.exceptions.auth.InvalidOperationException;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
@@ -153,5 +154,19 @@ public class ServiceServiceImpl implements ServiceService{
         service.setPrice(request.price());
 
         return ServiceMapper.toServiceCreatedDTO(serviceRepository.save(service));
+    }
+
+    @Override
+    public ServiceDetailsResponse getServiceDetails(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("La id no puede ser nula.");
+        }
+
+        Optional<ServiceDetailsResponse> details = serviceRepository.getServiceDetailsNotDeleted(id);
+        if (details.isEmpty()) {
+            throw new ResourceNotFoundException("El servicio no existe o fue eliminado.");
+        }
+
+        return details.get();
     }
 }

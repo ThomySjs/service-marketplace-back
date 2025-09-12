@@ -5,6 +5,7 @@ import java.util.List;
 import com.servicemarketplace.api.domain.entities.Service;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
+import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
 
 public interface ServiceService {
@@ -24,4 +25,6 @@ public interface ServiceService {
     void deleteById(Long id);
 
     ServiceCreatedDTO update(ServiceDTO request);
+
+    ServiceDetailsResponse getServiceDetails(Long id);
 }

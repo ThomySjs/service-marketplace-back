@@ -54,7 +54,7 @@ public class SecurityConfig
 										"/swagger-resources/**",
 										"/actuator/**",
 										"/webjars/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/services").permitAll()
+						.requestMatchers(HttpMethod.GET, "/services/**").permitAll()
 						.anyRequest().authenticated()
 						)
 				.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
