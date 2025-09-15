@@ -45,4 +45,8 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public boolean isAdmin() {
+        return this.role.equals(Roles.ADMIN.name());
+    }
+
 }

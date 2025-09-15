@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.UserDTO;
-import com.servicemarketplace.api.exceptions.auth.UserNotFoundException;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.mappers.UserMapper;
 import com.servicemarketplace.api.services.UserService;
 
@@ -22,15 +22,38 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    public User getUserFromContext() {
+        //Obtiene el mail del contexto
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        return getUserByEmail(email);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        Optional<User> foundUser = userRepository.findByEmail(email);
+        if (foundUser.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario invalido.");
+        }
+        return foundUser.get();
+    }
+
+    @Override
+    public User getUserById(Long id) {
+        Optional<User> foundUser = userRepository.findById(id);
+        if (foundUser.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario invalido.");
+        }
+        return foundUser.get();
+    }
+
+    @Override
     public UserDTO getAccountDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
-        Optional<User> foundUser = userRepository.findByEmail(email);
-        if (foundUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario invalido.");
-        }
-        User user = foundUser.get();
+        User user = getUserByEmail(email);
 
         return UserMapper.toUserDTO(user);
     }

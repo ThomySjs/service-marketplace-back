@@ -9,8 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.servicemarketplace.api.exceptions.auth.CategoryNotFoundException;
-import com.servicemarketplace.api.exceptions.auth.UserNotFoundException;
+import com.servicemarketplace.api.exceptions.auth.InvalidOperationException;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 
 import io.jsonwebtoken.JwtException;
@@ -56,15 +56,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Correo no confirmado, por favor verifica tu casilla de correos.", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
-        LOG.error("Manejando UserNotFoundException: {}", e.getMessage());
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException e) {
+        LOG.error("Manejando ResourceNotFoundException: {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<String> handleCategoryNotFoundException(CategoryNotFoundException e) {
-        LOG.error("Manejando CategoryNotFoundException: {}", e.getMessage());
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<String> handleInvalidOperationException(InvalidOperationException e) {
+        LOG.error("Manejando InvalidOperationException: {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

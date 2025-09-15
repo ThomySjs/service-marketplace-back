@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.repositories.CategoryRepository;
 import com.servicemarketplace.api.dto.CategoryDTO;
-import com.servicemarketplace.api.exceptions.auth.CategoryNotFoundException;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,16 @@ import lombok.RequiredArgsConstructor;
 public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
+
+    @Override
+    public Category getCategoryById(Long id) {
+        Optional<Category> foundCategory = categoryRepository.findByIdNotDeleted(id);
+        if (foundCategory.isEmpty()) {
+            throw new ResourceNotFoundException("La categoria no existe.");
+        }
+
+        return foundCategory.get();
+    }
 
     public void validateTitle(String title) {
         //Valida el titulo
@@ -55,12 +65,7 @@ public class CategoryServiceImpl implements CategoryService{
             throw new IllegalArgumentException("La id no puede ser nula");
         }
 
-        Optional<Category> foundCategory = categoryRepository.findByIdNotDeleted(id);
-        if (foundCategory.isEmpty()) {
-            throw new CategoryNotFoundException("La categoria no existe.");
-        }
-
-        Category category = foundCategory.get();
+        Category category = getCategoryById(id);
         category.setDeleted(true);
         categoryRepository.save(category);
     }
@@ -72,13 +77,8 @@ public class CategoryServiceImpl implements CategoryService{
             throw new IllegalArgumentException("El id de la categoria es obligatoria.");
         }
         validateTitle(categoryRequest.title());
-        Optional<Category> foundCategory = categoryRepository.findByIdNotDeleted(categoryRequest.id());
 
-        if (foundCategory.isEmpty()) {
-            throw new CategoryNotFoundException("La categoria no existe.");
-        }
-
-        Category category = foundCategory.get();
+        Category category = getCategoryById(categoryRequest.id());
         category.setTitle(categoryRequest.title());
         category.setDescription(categoryRequest.description());
 
