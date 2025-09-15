@@ -8,12 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
 import com.servicemarketplace.api.services.AuthService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 import org.springframework.ui.Model;
 import jakarta.validation.Valid;
@@ -33,7 +36,9 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "Registra un usuario.")
     @PostMapping("/register")
+    @ResponseBody
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = authService.register(request);
         if (response.status().startsWith("error")) {
@@ -42,17 +47,22 @@ public class AuthController {
         return ResponseEntity.ok(response.message());
     }
 
+    @Operation(summary = "Crea nuevos refresh y session tokens.")
     @PostMapping("/refresh")
+    @ResponseBody
 	public ResponseEntity<TokenResponse> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authHeader) {
 		final TokenResponse token = authService.refresh(authHeader);
 		return ResponseEntity.ok(token);
 	}
 
+    @Operation(summary = "Valida las credenciales del usuario y genera tokens se acceso.")
     @PostMapping("/login")
+    @ResponseBody
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @Operation(summary = "Verifica el correo electronico del usuario.")
     @GetMapping("/verify")
     public String verify(@RequestParam("token") String token, Model model) {
         String message = authService.verify(token);
