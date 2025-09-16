@@ -8,6 +8,7 @@ import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
 import com.servicemarketplace.api.services.ServiceService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -31,11 +32,13 @@ public class ServiceController {
 
     private final ServiceService serviceService;
 
+    @Operation(summary = "Crea un servicio.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ServiceCreatedDTO> createService(@ModelAttribute ServiceDTO request) {
         return ResponseEntity.ok(serviceService.create(request));
     }
 
+    @Operation(summary = "Obtiene los servicios, permite filtrar por vendedor o categoria.")
     @GetMapping()
     public ResponseEntity<List<ServiceListResponse>> getServices(
         @RequestParam(value = "seller", required = false) Optional<Long> sellerId,
@@ -51,18 +54,20 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getAllNotDeleted());
     }
 
+    @Operation(summary = "Obtiene el detalle de un servicio.")
     @GetMapping("{id}")
     public ResponseEntity<ServiceDetailsResponse> getServiceDetails(@PathVariable Long id) {
         return ResponseEntity.ok(serviceService.getServiceDetails(id));
     }
 
-
+    @Operation(summary = "Borra un servicio.")
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         serviceService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Actualiza un servicio.")
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ServiceCreatedDTO> updateService(@ModelAttribute ServiceDTO request) {
         return ResponseEntity.ok(serviceService.update(request));

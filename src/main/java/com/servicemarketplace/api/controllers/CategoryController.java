@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.servicemarketplace.api.dto.CategoryDTO;
 import com.servicemarketplace.api.services.CategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -29,17 +30,20 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @Operation(summary = "Agrega una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<CategoryDTO> createCategory(@Validated @RequestBody CategoryDTO request) {
         return ResponseEntity.ok(categoryService.create(request));
     }
 
+    @Operation(summary = "Obtiene todas las categorias.")
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    @Operation(summary = "Elimina una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
@@ -47,6 +51,7 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Edita una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping
     public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryRequest) {
