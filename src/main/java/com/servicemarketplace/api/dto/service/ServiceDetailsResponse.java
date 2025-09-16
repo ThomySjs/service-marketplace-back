@@ -14,6 +14,7 @@ public class ServiceDetailsResponse {
     private String title;
     private String description;
     private Double price;
+    private String image;
     private SellerDTO seller;
     private String categoryTitle;
 }

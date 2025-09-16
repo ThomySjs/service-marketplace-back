@@ -60,6 +60,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               s.title,
               s.description,
               s.price,
+              s.imagePath,
               new com.servicemarketplace.api.dto.service.SellerDTO(s.seller.id, s.seller.name, s.seller.phone, s.seller.email),
               s.category.title)
               FROM Service s
