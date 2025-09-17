@@ -63,9 +63,8 @@ public class ServiceServiceImpl implements ServiceService{
     }
 
     @Override
-    public List<ServiceListResponse> getByCategory(Long id) {
-        Category category = categoryService.getCategoryById(id);
-        return serviceRepository.findByCategory(category);
+    public List<ServiceListResponse> getByCategory(String[] categoryId) {
+        return serviceRepository.findByCategory(categoryId);
     }
 
     @Override

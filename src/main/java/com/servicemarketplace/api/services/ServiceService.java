@@ -16,7 +16,7 @@ public interface ServiceService {
 
     List<ServiceListResponse> getBySeller(Long id);
 
-    List<ServiceListResponse> getByCategory(Long id);
+    List<ServiceListResponse> getByCategory(String[] id);
 
     List<ServiceListResponse> getAllNotDeleted();
 

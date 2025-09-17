@@ -38,9 +38,9 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               s.price)
               FROM Service s
               WHERE s.deleted = false
-              AND s.category = :category
+              AND s.category.id IN :category
               """)
-       List<ServiceListResponse> findByCategory(@Param("category") Category category);
+       List<ServiceListResponse> findByCategory(@Param("category") String[] category);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +

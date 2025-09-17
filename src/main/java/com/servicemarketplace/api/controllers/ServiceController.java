@@ -42,7 +42,7 @@ public class ServiceController {
     @GetMapping()
     public ResponseEntity<List<ServiceListResponse>> getServices(
         @RequestParam(value = "seller", required = false) Optional<Long> sellerId,
-        @RequestParam(value = "category", required = false) Optional<Long> categoryId) {
+        @RequestParam(value = "category", required = false) Optional<String[]> categoryId) {
         if (sellerId.isPresent()) {
             return ResponseEntity.ok(serviceService.getBySeller(sellerId.get()));
         }
