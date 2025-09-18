@@ -18,6 +18,8 @@ public interface ServiceService {
 
     List<ServiceListResponse> getByCategory(String[] id);
 
+    List<ServiceListResponse> getByTitle(String title);
+
     List<ServiceListResponse> getAllNotDeleted();
 
     void validateServiceOwner(Service service);

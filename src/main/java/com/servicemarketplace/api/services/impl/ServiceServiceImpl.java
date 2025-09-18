@@ -68,6 +68,11 @@ public class ServiceServiceImpl implements ServiceService{
     }
 
     @Override
+    public List<ServiceListResponse> getByTitle(String title) {
+        return serviceRepository.findByTitle(title);
+    }
+
+    @Override
     public List<ServiceListResponse> getAllNotDeleted() {
         return serviceRepository.findAllNotDeleted();
     }
