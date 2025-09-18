@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.entities.Service;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
@@ -41,6 +40,19 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.category.id IN :category
               """)
        List<ServiceListResponse> findByCategory(@Param("category") String[] category);
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price)
+              FROM Service s
+              WHERE s.deleted = false
+              AND s.title LIKE %:title%
+              """)
+       List<ServiceListResponse> findByTitle(@Param("title") String title);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +

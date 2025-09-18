@@ -42,13 +42,19 @@ public class ServiceController {
     @GetMapping()
     public ResponseEntity<List<ServiceListResponse>> getServices(
         @RequestParam(value = "seller", required = false) Optional<Long> sellerId,
-        @RequestParam(value = "category", required = false) Optional<String[]> categoryId) {
+        @RequestParam(value = "category", required = false) Optional<String[]> categoryId,
+        @RequestParam(value = "title", required = false) Optional<String> title) {
+
         if (sellerId.isPresent()) {
             return ResponseEntity.ok(serviceService.getBySeller(sellerId.get()));
         }
 
         if (categoryId.isPresent()) {
             return ResponseEntity.ok(serviceService.getByCategory(categoryId.get()));
+        }
+
+        if (title.isPresent()) {
+            return ResponseEntity.ok(serviceService.getByTitle(title.get()));
         }
 
         return ResponseEntity.ok(serviceService.getAllNotDeleted());
