@@ -11,9 +11,10 @@ import com.servicemarketplace.api.services.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,24 +41,29 @@ public class ServiceController {
 
     @Operation(summary = "Obtiene los servicios, permite filtrar por vendedor o categoria.")
     @GetMapping()
-    public ResponseEntity<List<ServiceListResponse>> getServices(
+    public ResponseEntity<Page<ServiceListResponse>> getServices(
         @RequestParam(value = "seller", required = false) Optional<Long> sellerId,
         @RequestParam(value = "category", required = false) Optional<String[]> categoryId,
-        @RequestParam(value = "title", required = false) Optional<String> title) {
+        @RequestParam(required = false) Optional<String> title,
+        Pageable pageable) {
+
+        if (title.isPresent() && categoryId.isPresent()) {
+            return ResponseEntity.ok(serviceService.getByCategoryAndTitle(categoryId.get(), title.get(), pageable));
+        }
 
         if (sellerId.isPresent()) {
-            return ResponseEntity.ok(serviceService.getBySeller(sellerId.get()));
+            return ResponseEntity.ok(serviceService.getBySeller(sellerId.get(), pageable));
         }
 
         if (categoryId.isPresent()) {
-            return ResponseEntity.ok(serviceService.getByCategory(categoryId.get()));
+            return ResponseEntity.ok(serviceService.getByCategory(categoryId.get(), pageable));
         }
 
         if (title.isPresent()) {
-            return ResponseEntity.ok(serviceService.getByTitle(title.get()));
+            return ResponseEntity.ok(serviceService.getByTitle(title.get(), pageable));
         }
 
-        return ResponseEntity.ok(serviceService.getAllNotDeleted());
+        return ResponseEntity.ok(serviceService.getAllNotDeleted(pageable));
     }
 
     @Operation(summary = "Obtiene el detalle de un servicio.")

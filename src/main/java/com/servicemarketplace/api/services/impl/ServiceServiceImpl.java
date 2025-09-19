@@ -1,7 +1,9 @@
 package com.servicemarketplace.api.services.impl;
 
-import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.entities.Service;
@@ -57,24 +59,29 @@ public class ServiceServiceImpl implements ServiceService{
     }
 
     @Override
-    public List<ServiceListResponse> getBySeller(Long id) {
+    public Page<ServiceListResponse> getBySeller(Long id, Pageable pageable) {
         User seller = userService.getUserById(id);
-        return serviceRepository.findBySeller(seller);
+        return serviceRepository.findBySeller(seller, pageable);
     }
 
     @Override
-    public List<ServiceListResponse> getByCategory(String[] categoryId) {
-        return serviceRepository.findByCategory(categoryId);
+    public Page<ServiceListResponse> getByCategory(String[] categoryId, Pageable pageable) {
+        return serviceRepository.findByCategory(categoryId, pageable);
     }
 
     @Override
-    public List<ServiceListResponse> getByTitle(String title) {
-        return serviceRepository.findByTitle(title);
+    public Page<ServiceListResponse> getByTitle(String title, Pageable pageable) {
+        return serviceRepository.findByTitle(title, pageable);
     }
 
     @Override
-    public List<ServiceListResponse> getAllNotDeleted() {
-        return serviceRepository.findAllNotDeleted();
+    public Page<ServiceListResponse> getByCategoryAndTitle(String[] category, String title, Pageable pageable) {
+        return serviceRepository.findByCategoryAndTitleNotDeleted(category, title, pageable);
+    }
+
+    @Override
+    public Page<ServiceListResponse> getAllNotDeleted(Pageable pageable) {
+        return serviceRepository.findAllNotDeleted(pageable);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.servicemarketplace.api.services;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.servicemarketplace.api.domain.entities.Service;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
@@ -14,13 +15,15 @@ public interface ServiceService {
 
     ServiceCreatedDTO create(ServiceDTO request);
 
-    List<ServiceListResponse> getBySeller(Long id);
+    Page<ServiceListResponse> getBySeller(Long id, Pageable pageable);
 
-    List<ServiceListResponse> getByCategory(String[] id);
+    Page<ServiceListResponse> getByCategory(String[] id, Pageable pageable);
 
-    List<ServiceListResponse> getByTitle(String title);
+    Page<ServiceListResponse> getByTitle(String title, Pageable pageable);
 
-    List<ServiceListResponse> getAllNotDeleted();
+    Page<ServiceListResponse> getByCategoryAndTitle(String[] category, String ttle, Pageable pageable);
+
+    Page<ServiceListResponse> getAllNotDeleted(Pageable pageable);
 
     void validateServiceOwner(Service service);
 
