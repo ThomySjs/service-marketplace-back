@@ -1,8 +1,9 @@
 package com.servicemarketplace.api.domain.repositories;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,7 +27,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.seller = :seller
               """)
-       List<ServiceListResponse> findBySeller(@Param("seller") User seller);
+       Page<ServiceListResponse> findBySeller(@Param("seller") User seller, Pageable pageable);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
@@ -39,7 +40,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.category.id IN :category
               """)
-       List<ServiceListResponse> findByCategory(@Param("category") String[] category);
+       Page<ServiceListResponse> findByCategory(@Param("category") String[] category, Pageable pageable);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
@@ -52,7 +53,21 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.title LIKE %:title%
               """)
-       List<ServiceListResponse> findByTitle(@Param("title") String title);
+       Page<ServiceListResponse> findByTitle(@Param("title") String title, Pageable pageable);
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price)
+              FROM Service s
+              WHERE s.deleted = false
+              AND s.category.id IN :category
+              AND s.title LIKE %:title%
+              """)
+       Page<ServiceListResponse> findByCategoryAndTitleNotDeleted(@Param("category") String[] category, @Param("title") String title, Pageable pageable);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
@@ -64,7 +79,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.deleted = false
               """)
-       List<ServiceListResponse> findAllNotDeleted();
+       Page<ServiceListResponse> findAllNotDeleted(Pageable pageable);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceDetailsResponse(
