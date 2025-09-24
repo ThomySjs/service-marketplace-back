@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class SellerDTO {
     private Long id;
     private String name;
+    private String lastName;
     private String phone;
     private String email;
 }

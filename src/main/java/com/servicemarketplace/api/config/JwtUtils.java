@@ -57,9 +57,9 @@ public class JwtUtils {
                 .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
-            throw new JwtException("El token ha expirado, por favor inicie sesión nuevamente");
+            throw new JwtException("token_expirado");
         } catch (Exception e) {
-            throw new JwtException("Token inválido");
+            throw new JwtException("token_invalido");
         }
     }
 

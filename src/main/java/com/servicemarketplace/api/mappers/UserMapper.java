@@ -2,6 +2,7 @@ package com.servicemarketplace.api.mappers;
 
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.dto.UserDTO;
+import com.servicemarketplace.api.dto.service.ServiceListResponse;
 
 public class UserMapper {
 
@@ -12,10 +13,20 @@ public class UserMapper {
         return UserDTO.builder()
             .id(user.getId())
             .name(user.getName())
+            .lastName(user.getLastName())
             .email(user.getEmail())
             .address(user.getAddress())
             .phone(user.getPhone())
             .createdAt(user.getCreatedAt())
+            .createdServices(user.getServices().stream()
+                .map(s -> new ServiceListResponse(
+                s.getId(),
+                s.getCategory().getTitle(),
+                s.getImagePath(),
+                s.getTitle(),
+                s.getPrice()
+            ))
+        .toList())
             .build();
     }
 }

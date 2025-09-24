@@ -88,6 +88,9 @@ public class SecurityConfig
 		}
 
 		RefreshToken foundToken = refreshTokenRepository.findByToken(token);
+		if (foundToken.isRevoked()) {
+			throw new IllegalArgumentException("Session invalida.");
+		}
 		foundToken.setRevoked(true);
 		refreshTokenRepository.save(foundToken);
 		log.info("Logout exitoso, token id: {}", foundToken.getId());
