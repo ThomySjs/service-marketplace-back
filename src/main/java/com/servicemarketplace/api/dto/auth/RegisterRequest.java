@@ -9,6 +9,9 @@ public record RegisterRequest(
     @NotNull(message = "El nombre no puede ser nulo")
     @NotBlank(message = "El nombre no debe estar vacio")
     String name,
+    @NotNull(message = "El apellido no puede ser nulo")
+    @NotBlank(message = "El apellido no debe estar vacio")
+    String lastName,
     @NotNull(message = "El correo no puede ser nulo")
     @Email(message = "Email invalido")
     @NotBlank(message = "El email no puede estar vacio")
