@@ -1,5 +1,6 @@
 package com.servicemarketplace.api.services;
 
+import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
@@ -13,4 +14,6 @@ public interface AuthService {
     TokenResponse login(LoginRequest request);
 
     String verify(String token);
+
+    void changePassword(ChangePasswordDTO dto);
 }

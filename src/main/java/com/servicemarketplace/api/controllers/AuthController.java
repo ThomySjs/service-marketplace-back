@@ -4,12 +4,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
@@ -69,6 +71,13 @@ public class AuthController {
 
         model.addAttribute("message", message);
         return "email-confirmation";
+    }
+
+    @Operation(summary = "Actualiza la contraseña de un usuario.")
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordDTO dto) {
+        authService.changePassword(dto);
+        return ResponseEntity.ok("Contraseña actualizada con exito.");
     }
 
 	@GetMapping("/info")
