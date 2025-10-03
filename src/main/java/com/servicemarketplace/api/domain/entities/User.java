@@ -33,11 +33,10 @@ public class User {
     private String name;
     @Column(unique=true)
     private String email;
-    @Column(name = "last_name")
-    private String lastName;
     private String phone;
     private String password;
     private String address;
+    private String imagePath;
     @Builder.Default
     private boolean verified = false;
     @Builder.Default

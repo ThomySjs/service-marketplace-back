@@ -1,4 +1,4 @@
-package com.servicemarketplace.api.dto;
+package com.servicemarketplace.api.dto.user;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +11,7 @@ import lombok.Builder;
 public record UserDTO(
     Long id,
     String name,
-    String lastName,
+    String imagePath,
     String email,
     String address,
     String phone,

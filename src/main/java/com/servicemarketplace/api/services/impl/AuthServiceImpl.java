@@ -22,6 +22,7 @@ import com.servicemarketplace.api.dto.auth.TokenResponse;
 import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 import com.servicemarketplace.api.services.AuthService;
 import com.servicemarketplace.api.services.EmailService;
+import com.servicemarketplace.api.services.ImageService;
 import com.servicemarketplace.api.services.UserService;
 
 import io.jsonwebtoken.JwtException;
@@ -40,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final RouteService routeService;
     private final MailConfig mailConfig;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
+    private final ImageService imageService;
 
 
     @Override
@@ -48,8 +50,8 @@ public class AuthServiceImpl implements AuthService {
         User newUser = User.builder()
             .name(request.name())
             .email(request.email())
+            .imagePath(imageService.upload(request.image()))
             .phone(request.phone())
-            .lastName(request.lastName())
             .password(passwordEncoder.encode(request.password()))
             .address(request.address())
             .zoneId(request.zoneId())

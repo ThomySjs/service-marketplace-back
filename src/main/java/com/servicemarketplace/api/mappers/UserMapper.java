@@ -1,8 +1,8 @@
 package com.servicemarketplace.api.mappers;
 
 import com.servicemarketplace.api.domain.entities.User;
-import com.servicemarketplace.api.dto.UserDTO;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.user.UserDTO;
 
 public class UserMapper {
 
@@ -13,7 +13,7 @@ public class UserMapper {
         return UserDTO.builder()
             .id(user.getId())
             .name(user.getName())
-            .lastName(user.getLastName())
+            .imagePath(user.getImagePath())
             .email(user.getEmail())
             .address(user.getAddress())
             .phone(user.getPhone())

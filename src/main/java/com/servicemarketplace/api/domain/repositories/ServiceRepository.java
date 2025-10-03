@@ -88,7 +88,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               s.description,
               s.price,
               s.imagePath,
-              new com.servicemarketplace.api.dto.service.SellerDTO(s.seller.id, s.seller.name, s.seller.lastName, s.seller.phone, s.seller.email),
+              new com.servicemarketplace.api.dto.service.SellerDTO(s.seller.id, s.seller.name, s.seller.phone, s.seller.email),
               s.category.title)
               FROM Service s
               WHERE s.deleted = false
