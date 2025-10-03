@@ -37,7 +37,53 @@ Brindar una herramienta para aumentar la exposición y el alcance de emprendedor
 - Pagos online.
 - Calificaciones y reseñas.
 
+## Objetivos SMART
+
+- **Específico:** Desarrollar una aplicación web que permita a los emprendedores y pymes tener un medio unificado mediante el cual promover sus servicios.
+
+- **Medible:** El usuario debe poder crear una cuenta y realizar las operaciones CRUD para sus servicios.
+
+- **Alcanzable:** Conseguir desplegar la aplicación y tener los primeros 10 usuarios.
+
+- **Relevante:** Aumentar la visibilidad de los emprendedores y pymes.
+
+- **Temporal:** Entregar el MVP a finales de noviembre.
+
 ---
+
+## Entrega
+
+- **MVP:** Sistema donde un usuario no registrado pueda ver y filtrar servicios publicados. Además, permite registrarse y realizar operaciones CRUD con los servicios.
+
+---
+
+## Supuestos y restricciones
+
+- La aplicación será web en su primera versión.
+- Los usuarios podrán ser diferenciados entre Usuario y Administrador.
+- Un usuario podrá adquirir un plan superior para obtener más beneficios.
+
+**Restricciones:**
+- Los usuarios gratuitos podrán mantener 1 servicio activo.
+- Los usuarios pagos podrán tener hasta 3 servicios activos.
+
+---
+
+## Criterios de éxito
+
+- Permitirle al usuario no registrado ver el listado de servicios y filtrarlos.
+- Permitirle al usuario crear una cuenta y gestionar sus servicios.
+- Generar una interfaz gráfica sencilla e intuitiva.
+
+---
+
+## Cronograma
+
+- **Inicio:** Configuración del proyecto.
+- **Desarrollo:** CRUD de categorías, servicios y usuarios.
+- **Integración:** Sistema de pagos y planes de usuarios.
+- **Cierre:** Documentación y tests.
+
 
 ## 👥 Interesados
 
