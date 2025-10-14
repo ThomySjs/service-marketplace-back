@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.servicemarketplace.api.config.Roles;
+import com.servicemarketplace.api.dto.user.UpdateUserDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +56,12 @@ public class User {
 
     public boolean isAdmin() {
         return this.role.equals(Roles.ADMIN.name());
+    }
+
+    public void fromDTO(UpdateUserDTO dto) {
+        this.name = dto.name();
+        this.address = dto.address();
+        this.phone = dto.phone();
     }
 
 }

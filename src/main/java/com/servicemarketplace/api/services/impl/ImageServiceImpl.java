@@ -54,6 +54,9 @@ public class ImageServiceImpl implements ImageService{
 
     @Override
     public void delete(String imagePath) {
+        if (imagePath.equals(imageConfig.getDefaultImage())) {
+            return;
+        }
         //Crea el cliente de cloudinary
         Cloudinary cloudinary = new Cloudinary(imageConfig.getUrl());
 

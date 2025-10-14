@@ -19,12 +19,14 @@ public class UserMapper {
             .phone(user.getPhone())
             .createdAt(user.getCreatedAt())
             .createdServices(user.getServices().stream()
+                .filter(s -> !s.isDeleted())
                 .map(s -> new ServiceListResponse(
                 s.getId(),
                 s.getCategory().getTitle(),
                 s.getImagePath(),
                 s.getTitle(),
-                s.getPrice()
+                s.getPrice(),
+                s.getDescription()
             ))
         .toList())
             .build();

@@ -15,4 +15,5 @@ public class ServiceListResponse {
     private String image;
     private String title;
     private Double price;
+    private String description;
 }
