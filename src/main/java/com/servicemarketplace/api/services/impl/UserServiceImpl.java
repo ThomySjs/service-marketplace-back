@@ -90,7 +90,9 @@ public class UserServiceImpl implements UserService {
         }
 
         //Elimina la imagen vieja
-        imageService.delete(user.getImagePath());
+        if (user.getImagePath() != null) {
+            imageService.delete(user.getImagePath());
+        }
 
         user.setImagePath(newImagePath);
         userRepository.save(user);
