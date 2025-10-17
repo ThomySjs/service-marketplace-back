@@ -1,5 +1,7 @@
 package com.servicemarketplace.api.dto.auth;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,9 +11,7 @@ public record RegisterRequest(
     @NotNull(message = "El nombre no puede ser nulo")
     @NotBlank(message = "El nombre no debe estar vacio")
     String name,
-    @NotNull(message = "El apellido no puede ser nulo")
-    @NotBlank(message = "El apellido no debe estar vacio")
-    String lastName,
+    MultipartFile image,
     @NotNull(message = "El correo no puede ser nulo")
     @Email(message = "Email invalido")
     @NotBlank(message = "El email no puede estar vacio")

@@ -76,7 +76,7 @@ public class ServiceController {
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         serviceService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Actualiza un servicio.")

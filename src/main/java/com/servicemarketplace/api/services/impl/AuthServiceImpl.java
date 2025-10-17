@@ -14,6 +14,7 @@ import com.servicemarketplace.api.config.CustomConfig.MailConfig;
 import com.servicemarketplace.api.domain.entities.RefreshToken;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
+import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
@@ -21,6 +22,8 @@ import com.servicemarketplace.api.dto.auth.TokenResponse;
 import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 import com.servicemarketplace.api.services.AuthService;
 import com.servicemarketplace.api.services.EmailService;
+import com.servicemarketplace.api.services.ImageService;
+import com.servicemarketplace.api.services.UserService;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +34,14 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final EmailService mailService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final RouteService routeService;
     private final MailConfig mailConfig;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
+    private final ImageService imageService;
 
 
     @Override
@@ -45,8 +50,8 @@ public class AuthServiceImpl implements AuthService {
         User newUser = User.builder()
             .name(request.name())
             .email(request.email())
+            .imagePath(imageService.upload(request.image()))
             .phone(request.phone())
-            .lastName(request.lastName())
             .password(passwordEncoder.encode(request.password()))
             .address(request.address())
             .zoneId(request.zoneId())
@@ -130,6 +135,21 @@ public class AuthServiceImpl implements AuthService {
         foundUser.setVerified(true);
         userRepository.save(foundUser);
         return "Correo verificado con exito.";
+    }
+
+    @Override
+    public void changePassword(ChangePasswordDTO dto) {
+        //Obtiene el usuario del token
+        User user = userService.getUserFromContext();
+
+        //Compara la contraseña actual con la que esta persistida en la base de datos, si no es la misma, devuelve error
+        if (!passwordEncoder.matches(dto.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Contraseña invalida.");
+        }
+
+        //Si coinciden, persiste la contraseña nueva
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        userRepository.save(user);
     }
 
 }

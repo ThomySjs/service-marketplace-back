@@ -2,6 +2,7 @@ package com.servicemarketplace.api.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -95,7 +96,9 @@ public class JwtUtils {
         return Jwts.builder()
             .signWith(key)
             .subject(subject)
+            .issuedAt(new Date())
             .claim("type", type.getType())
+            .claim("jti", UUID.randomUUID().toString())
             .expiration(new Date(new Date().getTime() + type.getExpTime()))
             .compact();
     }

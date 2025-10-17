@@ -5,21 +5,28 @@ import java.util.Optional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
-import com.servicemarketplace.api.dto.UserDTO;
+import com.servicemarketplace.api.dto.user.UpdateUserDTO;
+import com.servicemarketplace.api.dto.user.UserDTO;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.mappers.UserMapper;
+import com.servicemarketplace.api.services.ImageService;
 import com.servicemarketplace.api.services.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ImageService imageService;
 
     @Override
     public User getUserFromContext() {
@@ -56,5 +63,40 @@ public class UserServiceImpl implements UserService {
         User user = getUserByEmail(email);
 
         return UserMapper.toUserDTO(user);
+    }
+
+    @Override
+    public UserDTO updateUser(@Valid UpdateUserDTO dto){
+        //Obtiene el usuario del token
+        User user = getUserFromContext();
+
+        //Actualiza los datos
+        user.fromDTO(dto);
+
+        User updatedUser = userRepository.save(user);
+
+        return UserMapper.toUserDTO(updatedUser);
+    }
+
+    @Override
+    public String updateProfilePicture(MultipartFile profilePicture) {
+        //Obtiene el usuario del token
+        User user = getUserFromContext();
+
+        //Sube la imagen y verifica que se haya subido
+        String newImagePath = imageService.upload(profilePicture);
+        if (newImagePath == null) {
+            throw new IllegalStateException("Ocurrio un error al actualizar la imagen.");
+        }
+
+        //Elimina la imagen vieja
+        if (user.getImagePath() != null) {
+            imageService.delete(user.getImagePath());
+        }
+
+        user.setImagePath(newImagePath);
+        userRepository.save(user);
+
+        return newImagePath;
     }
 }

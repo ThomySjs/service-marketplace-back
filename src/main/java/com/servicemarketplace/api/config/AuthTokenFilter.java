@@ -32,7 +32,8 @@ public class AuthTokenFilter extends OncePerRequestFilter
 	{
 		try
 		{
-			if (request.getServletPath().contains("/auth"))
+			if (request.getServletPath().contains("/auth")
+				&& !request.getServletPath().contains("/auth/change-password"))
 			{
 				filterChain.doFilter(request, response);
 				return;

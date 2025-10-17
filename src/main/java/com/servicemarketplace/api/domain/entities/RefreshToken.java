@@ -28,7 +28,7 @@ public class RefreshToken {
     @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 500)
     private String token;
     @Builder.Default
     private boolean revoked = false;
