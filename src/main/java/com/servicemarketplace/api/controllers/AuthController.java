@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 
 import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
+import com.servicemarketplace.api.dto.auth.RecoverPasswordDTO;
+import com.servicemarketplace.api.dto.auth.RecoveryCodeDTO;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
@@ -80,6 +82,30 @@ public class AuthController {
     public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordDTO dto) {
         authService.changePassword(dto);
         return ResponseEntity.ok("Contraseña actualizada con exito.");
+    }
+
+    @Operation(summary = "Envia codigo de recuperacion de contraseña.")
+    @GetMapping("/recovery-code")
+    public ResponseEntity<String> sendRecoveryCode(@RequestParam("email") String email) {
+        if (email != null) {
+            authService.sendRecoveryCode(email);
+            return ResponseEntity.ok("Codigo enviado, revisa tu casilla de correo electronico.");
+        }
+
+        return ResponseEntity.badRequest().body("Correo invalido.");
+    }
+
+    @Operation(summary = "Valida el codigo de recuperacion.")
+    @PostMapping("/recovery-code")
+    public ResponseEntity<?> validateRecoveryCode(@Valid @RequestBody RecoveryCodeDTO code) {
+        return ResponseEntity.ok(authService.validateRecoveryCode(code));
+    }
+
+    @Operation(summary = "Actualiza la contraseña de un usuario.")
+    @PostMapping("/recover-password")
+    public ResponseEntity<String> recoverPassword(@RequestHeader(HttpHeaders.AUTHORIZATION) String header, @RequestBody RecoverPasswordDTO password) {
+        authService.recoverPassword(header, password.password());
+        return ResponseEntity.ok("Contraseña actualizada correctamente.");
     }
 
 	@GetMapping("/info")

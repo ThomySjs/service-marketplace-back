@@ -1,5 +1,7 @@
 package com.servicemarketplace.api.services.impl;
 
+import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,11 +13,14 @@ import org.springframework.stereotype.Service;
 import com.servicemarketplace.api.config.JwtUtils;
 import com.servicemarketplace.api.config.TokenTypes;
 import com.servicemarketplace.api.config.CustomConfig.MailConfig;
+import com.servicemarketplace.api.domain.entities.RecoveryCode;
 import com.servicemarketplace.api.domain.entities.RefreshToken;
 import com.servicemarketplace.api.domain.entities.User;
+import com.servicemarketplace.api.domain.repositories.RecoveryCodeRepository;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
+import com.servicemarketplace.api.dto.auth.RecoveryCodeDTO;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
@@ -42,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final MailConfig mailConfig;
     private final RefreshTokenServiceImpl refreshTokenServiceImpl;
     private final ImageService imageService;
+    private final RecoveryCodeRepository recoveryCodeRepository;
 
 
     @Override
@@ -149,6 +155,57 @@ public class AuthServiceImpl implements AuthService {
 
         //Si coinciden, persiste la contraseña nueva
         user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void sendRecoveryCode(String email) {
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            return;
+        }
+
+        //Verificar si ya habia un codigo y lo elimina
+        Optional<RecoveryCode> oldRecoveryCode = recoveryCodeRepository.findByEmail(email);
+        if (oldRecoveryCode.isPresent()) {
+            recoveryCodeRepository.delete(oldRecoveryCode.get());
+        }
+
+        RecoveryCode recoveryCode = new RecoveryCode();
+        recoveryCode.setEmail(email);
+        RecoveryCode persistedCode = recoveryCodeRepository.save(recoveryCode);
+        mailService.sendRecoveryCode(email, persistedCode.getCode());
+    }
+
+    @Override
+    public Map<String, String> validateRecoveryCode(RecoveryCodeDTO dto) {
+        Optional<RecoveryCode> code = recoveryCodeRepository.findByEmail(dto.email());
+        if (code.isEmpty() || code.get().isExpired() || !code.get().isValid(dto)) {
+            throw new IllegalArgumentException("Codigo invalido.");
+        }
+        recoveryCodeRepository.delete(code.get());
+
+        Map<String, String> responseToken = Map.of("token", jwtUtils.generateToken(dto.email(), TokenTypes.RECOVERY));
+        return responseToken;
+    }
+
+    @Override
+    public void recoverPassword(String header, String password) {
+        //Parsea el header
+        String jwt = jwtUtils.parseJwtFromString(header);
+
+        //Validaciones
+        if (!jwtUtils.getTokenType(jwt).equals(TokenTypes.RECOVERY.getType())) {
+            throw new IllegalArgumentException("Token invalido");
+        }
+        if (jwtUtils.getExpirationFromToken(jwt).before(new Date())) {
+            throw new IllegalArgumentException("Token expirado.");
+        }
+
+        String email = jwtUtils.getUserFromToken(jwt);
+        User user = userService.getUserByEmail(email);
+
+        user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
     }
 
