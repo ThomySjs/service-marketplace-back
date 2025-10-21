@@ -191,9 +191,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void recoverPassword(String header, String password) {
-        //Parsea el header
-        String jwt = jwtUtils.parseJwtFromString(header);
-
+        String jwt = header;
+        //Parsea el header si contiene bearer
+        if (header.contains("Bearer")) {
+            jwt = jwtUtils.parseJwtFromString(header);
+        }
         //Validaciones
         if (!jwtUtils.getTokenType(jwt).equals(TokenTypes.RECOVERY.getType())) {
             throw new IllegalArgumentException("Token invalido");
@@ -201,7 +203,6 @@ public class AuthServiceImpl implements AuthService {
         if (jwtUtils.getExpirationFromToken(jwt).before(new Date())) {
             throw new IllegalArgumentException("Token expirado.");
         }
-
         String email = jwtUtils.getUserFromToken(jwt);
         User user = userService.getUserByEmail(email);
 
