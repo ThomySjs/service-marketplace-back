@@ -4,7 +4,8 @@ public enum TokenTypes {
     //Enum utilizado para centralizar los tipos de token y sus expiraciones.
     SESSION("Session", 7200000L), //2 hs
     CONFIRMATION("Confirmation", 1800000L), //30 mins
-    REFRESH("Refresh", 2629800000L); //1 mes
+    REFRESH("Refresh", 2629800000L), //1 mes
+    RECOVERY("Recovery", 180000L); //3 mins
 
     private final String type;
     private final Long expTime;

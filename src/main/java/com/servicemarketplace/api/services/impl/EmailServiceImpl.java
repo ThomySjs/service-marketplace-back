@@ -66,4 +66,25 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    @Async
+    public void sendRecoveryCode(String to, int code) {
+        //Crea el contexto para guardar las variables y despues las procesa junto con el template de thymeleaf
+        Context context = new Context();
+        context.setVariable("code", code);
+        String processedString = templateEngine.process("recovery-code", context);
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            message.setSubject("Recovery code");
+            MimeMessageHelper helper;
+            helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setText(processedString, true);
+            mailSender.send(message);
+        }catch (MessagingException e) {
+            log.info("Ocurrio un error el enviar el email.");
+        }
+    }
+
 }
