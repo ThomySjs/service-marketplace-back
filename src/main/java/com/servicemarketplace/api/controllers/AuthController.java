@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.MediaType;
 
+import com.servicemarketplace.api.config.CustomConfig.UrlConfig;
 import com.servicemarketplace.api.dto.auth.ChangePasswordDTO;
 import com.servicemarketplace.api.dto.auth.LoginRequest;
 import com.servicemarketplace.api.dto.auth.RecoverPasswordDTO;
@@ -40,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final UrlConfig urlConfig;
     private final AuthService authService;
 
     @Operation(summary = "Registra un usuario.")
@@ -71,9 +73,13 @@ public class AuthController {
     @Operation(summary = "Verifica el correo electronico del usuario.")
     @GetMapping("/verify")
     public String verify(@RequestParam("token") String token, Model model) {
-        String message = authService.verify(token);
+        Map<?, ?> response = authService.verify(token);
 
-        model.addAttribute("message", message);
+        System.out.println(urlConfig.getFrontendUrl());
+
+        model.addAttribute("message", response.get("message"));
+        model.addAttribute("status", response.get("status"));
+        model.addAttribute("redirectUrl", urlConfig.getFrontendUrl());
         return "email-confirmation";
     }
 
