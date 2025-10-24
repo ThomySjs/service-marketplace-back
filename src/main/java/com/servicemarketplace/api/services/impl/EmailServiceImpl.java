@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendConfirmationEmail(String to, String appUrl) {
+    public void sendConfirmationEmail(String to, String appUrl, String username) {
 
         //Obtiene la url de la aplicacion y la concatena con el token para ser enviado como link de confirmacion
         StringBuilder verificationRoute = new StringBuilder();
@@ -50,12 +50,13 @@ public class EmailServiceImpl implements EmailService {
 
         //Crea el contexto para guardar las variables y despues las procesa junto con el template de thymeleaf
         Context context = new Context();
-        context.setVariable("url", verificationRoute.toString());
+        context.setVariable("confirmationUrl", verificationRoute.toString());
+        context.setVariable("username", username);
         String processedString = templateEngine.process("email-template", context);
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            message.setSubject("Confirmation email");
+            message.setSubject("Confirmación de Correo Electrónico");
             MimeMessageHelper helper;
             helper = new MimeMessageHelper(message, true);
             helper.setTo(to);
@@ -68,15 +69,16 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendRecoveryCode(String to, int code) {
+    public void sendRecoveryCode(String to, int code, String expiration) {
         //Crea el contexto para guardar las variables y despues las procesa junto con el template de thymeleaf
         Context context = new Context();
         context.setVariable("code", code);
+        context.setVariable("expirationMinutes", expiration);
         String processedString = templateEngine.process("recovery-code", context);
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            message.setSubject("Recovery code");
+            message.setSubject("Recuperación de Contraseña");
             MimeMessageHelper helper;
             helper = new MimeMessageHelper(message, true);
             helper.setTo(to);

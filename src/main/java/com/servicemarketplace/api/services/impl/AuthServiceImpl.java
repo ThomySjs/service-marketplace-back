@@ -66,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             User savedUser = userRepository.save(newUser);
             if (mailConfig.isEnabled()) {
-                mailService.sendConfirmationEmail(savedUser.getEmail(), routeService.getAppUrl());
+                mailService.sendConfirmationEmail(savedUser.getEmail(), routeService.getAppUrl(), savedUser.getName());
             }
             return new RegisterResponse("ok", "Usuario registrado correctamente, revisa tu casilla de correo.");
         }catch (DataIntegrityViolationException e) {
@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
 
         //Verifica si el usuario confirmo su correo y si la opcion de correos esta habilitada (Solo para desarrollo)
         if (!user.isVerified() && mailConfig.isEnabled()) {
-            mailService.sendConfirmationEmail(user.getEmail(), routeService.getAppUrl());
+            mailService.sendConfirmationEmail(user.getEmail(), routeService.getAppUrl(), user.getName());
             throw new UserNotVerifiedException("Correo electronico no confirmado.");
         }
 
@@ -117,30 +117,49 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String verify(String token) {
+    public Map<?, ?> verify(String token) {
         //Parsea el token, comprueba su expiracion y verifica el tipo de token
-        jwtUtils.validateToken(token);
-        if (!jwtUtils.getTokenType(token).equals(TokenTypes.CONFIRMATION.getType())) {
-            throw new JwtException("Token invalido.");
+        try {
+            jwtUtils.validateToken(token);
+        }catch (JwtException e){
+            return Map.of(
+                "message", "Token invalido.",
+                "status", 400
+            );
         }
 
+        if (!jwtUtils.getTokenType(token).equals(TokenTypes.CONFIRMATION.getType())) {
+            return Map.of(
+                "message", "Token invalido.",
+                "status", 400
+            );
+        }
         //Obtiene el mail del token y trae el usuario de la base de datos
         String email = jwtUtils.getUserFromToken(token);
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            return "Usuario no encontrado.";
+            return Map.of(
+                "message", "Usuario no encontrado.",
+                "status", 404
+            );
         }
         User foundUser = user.get();
 
         //Chequea si no esta verificado
         if (foundUser.isVerified()) {
-            return "El correo ya se encuentra verificado.";
+            return Map.of(
+                "message", "El correo ya se encuentra verificado.",
+                "status", 200
+            );
         }
 
         //Verifica al usuario y lo persiste
         foundUser.setVerified(true);
         userRepository.save(foundUser);
-        return "Correo verificado con exito.";
+        return Map.of(
+                "message", "Correo verificado con éxito.",
+                "status", 200
+        );
     }
 
     @Override
@@ -174,7 +193,7 @@ public class AuthServiceImpl implements AuthService {
         RecoveryCode recoveryCode = new RecoveryCode();
         recoveryCode.setEmail(email);
         RecoveryCode persistedCode = recoveryCodeRepository.save(recoveryCode);
-        mailService.sendRecoveryCode(email, persistedCode.getCode());
+        mailService.sendRecoveryCode(email, persistedCode.getCode(), "5");
     }
 
     @Override

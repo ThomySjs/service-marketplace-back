@@ -16,7 +16,7 @@ public interface AuthService {
 
     TokenResponse login(LoginRequest request);
 
-    String verify(String token);
+    Map<?, ?> verify(String token);
 
     void changePassword(ChangePasswordDTO dto);
 
