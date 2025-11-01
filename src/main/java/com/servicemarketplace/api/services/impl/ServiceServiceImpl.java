@@ -1,7 +1,16 @@
 package com.servicemarketplace.api.services.impl;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.servicemarketplace.api.domain.entities.ServiceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -25,12 +34,13 @@ import lombok.RequiredArgsConstructor;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class ServiceServiceImpl implements ServiceService{
+public class ServiceServiceImpl implements ServiceService {
 
     private final ServiceRepository serviceRepository;
     private final UserService userService;
     private final CategoryService categoryService;
     private final ImageService imageService;
+	 private final ObjectMapper objectMapper;
 
     @Override
     public ServiceCreatedDTO create(ServiceDTO request){
@@ -180,4 +190,119 @@ public class ServiceServiceImpl implements ServiceService{
 
         return details.get();
     }
+
+	@Override
+	public Page<ServiceListResponse> getByStatusPendingForBO(Pageable pageable)
+	{
+		return serviceRepository.findByStatusPending(pageable);
+	}
+
+	@Override
+	public void markAsApproved(Long id)
+	{
+		var serviceForApproval = serviceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No se encontro el servicio con id " + id));
+		serviceForApproval.setStatus(ServiceStatus.APPROVED);
+		serviceRepository.save(serviceForApproval);
+	}
+
+	@Override
+	public void markAsRejected(Long id)
+	{
+		var serviceForRejection = serviceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No se encontro el servicio con id " + id));
+		serviceForRejection.setStatus(ServiceStatus.REJECTED);
+		serviceRepository.save(serviceForRejection);
+	}
+
+	@Override
+	public String getMetrics()
+	{
+		return getCombinedServiceMetrics();
+	}
+
+	public String getCombinedServiceMetrics() {
+		try {
+			LocalDateTime fromDate = LocalDate.now().minusMonths(12).atStartOfDay();
+
+			// --- 1️⃣ Primer dataset: por mes y estado (el que ya tenías) ---
+			List<Object[]> monthlyResults = serviceRepository.findServiceStatsFromDate(fromDate);
+
+			Map<String, Map<ServiceStatus, Long>> groupedByMonth = new LinkedHashMap<>();
+
+			for (Object[] row : monthlyResults)
+			{
+				int year = ((Number) row[0]).intValue();
+				int month = ((Number) row[1]).intValue();
+				ServiceStatus status = (ServiceStatus) row[2];
+				long count = ((Number) row[3]).longValue();
+
+				String key = String.format("%02d-%d", month, year);
+				groupedByMonth.putIfAbsent(key, new EnumMap<>(ServiceStatus.class));
+				groupedByMonth.get(key).put(status, count);
+			}
+
+			ArrayNode monthlyArray = objectMapper.createArrayNode();
+			groupedByMonth.forEach((key, counts) -> {
+				String[] parts = key.split("-");
+				int month = Integer.parseInt(parts[0]);
+				int year = Integer.parseInt(parts[1]);
+
+				String monthName = Month.of(month).getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
+
+				ObjectNode node = objectMapper.createObjectNode();
+				node.put("label", capitalize(monthName) + " " + year);
+				node.put("creados", counts.getOrDefault(ServiceStatus.APPROVED, 0L) + counts.getOrDefault(ServiceStatus.PENDING, 0L)
+						+ counts.getOrDefault(ServiceStatus.REJECTED, 0L));
+				node.put("aprobados", counts.getOrDefault(ServiceStatus.APPROVED, 0L));
+				node.put("pendientes", counts.getOrDefault(ServiceStatus.PENDING, 0L));
+				node.put("rechazados", counts.getOrDefault(ServiceStatus.REJECTED, 0L));
+				monthlyArray.add(node);
+			});
+
+			// --- 2️⃣ Segundo dataset: agrupado solo por estado ---
+			List<Object[]> statusResults = serviceRepository.findServiceCountByStatusFromDate(fromDate);
+
+			ArrayNode statusArray = objectMapper.createArrayNode();
+			for (Object[] row : statusResults)
+			{
+				ServiceStatus status = (ServiceStatus) row[0];
+				long count = ((Number) row[1]).longValue();
+
+				ObjectNode node = objectMapper.createObjectNode();
+				switch (status)
+				{
+					case PENDING ->
+					{
+						node.put("label", "Pendientes");
+						node.put("color", "#0088FE");
+					}
+					case APPROVED ->
+					{
+						node.put("label", "Aprobados");
+						node.put("color", "#00C49F");
+					}
+					case REJECTED ->
+					{
+						node.put("label", "Rechazados");
+						node.put("color", "#FF8042");
+					}
+				}
+				node.put("value", count);
+				statusArray.add(node);
+			}
+
+			// --- 3️⃣ Combinar ambos en un solo JSON ---
+			ObjectNode root = objectMapper.createObjectNode();
+			root.set("porMes", monthlyArray);
+			root.set("porEstado", statusArray);
+
+			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private String capitalize(String s) {
+		if (s == null || s.isEmpty()) return s;
+		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
 }
