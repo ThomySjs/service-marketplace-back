@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
+import com.servicemarketplace.api.services.SubscriptionService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +22,16 @@ import lombok.RequiredArgsConstructor;
 public class AppConfig{
 
 	private final UserRepository userRepository;
+	private final SubscriptionService subscriptionService;
 
 	@Bean
 	public UserDetailsService userDetailService() {
 		return username -> {
-			final User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado!"));
+			User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado!"));
+			//Valida si la subscripcion esta dentro del tiempo valido
+			if (user.getRole().equals(Roles.PREMIUM.name())) {
+				user = subscriptionService.checkSubscription(user);
+			}
 			return org.springframework.security.core.userdetails.User.builder()
 					.username(user.getEmail())
 					.password(user.getPassword())
