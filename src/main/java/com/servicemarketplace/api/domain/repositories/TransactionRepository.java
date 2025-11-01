@@ -1,25 +1,47 @@
 package com.servicemarketplace.api.domain.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.servicemarketplace.api.domain.entities.Transaction;
 import com.servicemarketplace.api.dto.transaction.TransactionResponseDTO;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long>{
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    @Query("""
+        SELECT t
+        FROM Transaction t
+        WHERE t.mpId = :mpId
+    """)
+    Optional<Transaction> getByMpId(@Param("mpId") Long mpId);
 
     @Query("""
         SELECT new com.servicemarketplace.api.dto.transaction.TransactionResponseDTO(
             t.id,
-            new com.servicemarketplace.api.dto.user.UserForTransactionDTO(
-                t.user.id, t.user.email, t.user.name),
-            t.membership,
             t.state,
+            new com.servicemarketplace.api.dto.transaction.SubscriptionResponseDTO(
+                t.subscription.id,
+                new com.servicemarketplace.api.dto.user.UserForSubscriptionDTO(
+                    t.subscription.user.id,
+                    t.subscription.user.email,
+                    t.subscription.user.name
+                ),
+                t.subscription.membership,
+                t.subscription.state,
+                t.subscription.endDate
+            ),
+            t.mpId,
+            t.total,
             t.date
         )
         FROM Transaction t
     """)
-    public List<TransactionResponseDTO> getAll();
+    List<TransactionResponseDTO> getAll();
+
 }

@@ -2,8 +2,10 @@ package com.servicemarketplace.api.domain.entities;
 
 import java.time.LocalDateTime;
 
-import com.servicemarketplace.api.config.TransactionState;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,18 +25,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "mp_id", unique = true)
+    private Long mpId;
     @ManyToOne
-    @NotNull (message = "El usuario no puede ser null")
-    private User user;
-    @ManyToOne
-    @NotNull (message = "La membresía no puede ser nula")
-    private Membership membership;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Subscription subscription;
     @Builder.Default
-    private String state = TransactionState.PENDING.name();
+    private Double total = 0.0;
+    private String state;
     private LocalDateTime date;
 
     @PrePersist

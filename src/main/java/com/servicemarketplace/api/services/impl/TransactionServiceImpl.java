@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.servicemarketplace.api.domain.entities.Membership;
+import com.servicemarketplace.api.domain.entities.Subscription;
 import com.servicemarketplace.api.domain.entities.Transaction;
 import com.servicemarketplace.api.domain.entities.User;
-import com.servicemarketplace.api.domain.repositories.MembershipRepository;
+import com.servicemarketplace.api.domain.repositories.SubscriptionRepository;
 import com.servicemarketplace.api.domain.repositories.TransactionRepository;
 import com.servicemarketplace.api.dto.transaction.TransactionDTO;
 import com.servicemarketplace.api.dto.transaction.TransactionResponseDTO;
@@ -24,32 +24,31 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserService userService;
-    private final MembershipRepository membershipRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Override
     public TransactionResponseDTO create(TransactionDTO dto) {
         User user = userService.getUserByEmail(dto.email());
-        Optional<Membership> membership = membershipRepository.findById(dto.membershipId());
 
-        if (user == null || membership.isEmpty()) {
-            throw new ResourceNotFoundException("Usuario o membresía no encontrado.");
+        if (user == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado.");
         }
 
+        Subscription subscription = subscriptionRepository.getByUserId(user.getId()).orElseThrow(
+            () -> new ResourceNotFoundException("El usuario no posee subscripción registrada, para crear una transacción primero debes registrar una suscripción al usuario.")
+        );
+
+
         Transaction transaction = new Transaction();
-        transaction.setUser(user);
-        transaction.setMembership(membership.get());
+        transaction.setTotal((dto.total() == null) ? subscription.getMembership().getPrice() : dto.total());
+        transaction.setSubscription(subscription);
 
         transactionRepository.save(transaction);
 
         TransactionResponseDTO transactionResponseDTO = new TransactionResponseDTO();
-        transactionResponseDTO.fromTransaction(transaction, membership.get(), user);
+        transactionResponseDTO.fromTransaction(transaction);
 
         return transactionResponseDTO;
-    }
-
-    @Override
-    public void delete(Long id) {
-        transactionRepository.deleteById(id);
     }
 
     @Override

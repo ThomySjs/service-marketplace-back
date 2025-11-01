@@ -10,8 +10,6 @@ public interface TransactionService {
 
     public TransactionResponseDTO create(TransactionDTO dto);
 
-    public void delete(Long id);
-
     public List<TransactionResponseDTO> getAll();
 
     public Transaction getById(Long id);
