@@ -79,7 +79,7 @@ public class AuthController {
 
         model.addAttribute("message", response.get("message"));
         model.addAttribute("status", response.get("status"));
-        model.addAttribute("redirectUrl", urlConfig.getFrontendUrl());
+        model.addAttribute("redirectUrl", urlConfig.getFrontendUrl() + "login");
         return "email-confirmation";
     }
 
