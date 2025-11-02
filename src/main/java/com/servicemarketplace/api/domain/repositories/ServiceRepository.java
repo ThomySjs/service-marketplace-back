@@ -19,8 +19,6 @@ import com.servicemarketplace.api.dto.service.ServiceListResponse;
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
 
-		Optional<Service> findById(Long id);
-
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
               s.id,
@@ -119,6 +117,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.deleted = false
               AND s.status = 'PENDING'
+              ORDER BY s.createdDate ASC
               """)
 		 Page<ServiceListResponse> findByStatusPending(Pageable pageable);
 
@@ -142,5 +141,16 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
 		 GROUP BY s.status
 		""")
 		List<Object[]> findServiceCountByStatusFromDate(LocalDateTime fromDate);
+
+		@Query("""
+		 SELECT c.id, c.message, COUNT(s)
+		 FROM Service s
+		 JOIN s.serviceRejectCause c
+		 WHERE s.createdDate >= :fromDate
+		 AND s.status = 'REJECTED'
+		 GROUP BY c.id, c.message
+		 ORDER BY COUNT(s) DESC
+		""")
+		List<Object[]> findRejectedCountByCauseFromDate(LocalDateTime fromDate);
 
 }

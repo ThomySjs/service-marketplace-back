@@ -1,9 +1,9 @@
 package com.servicemarketplace.api.controllers;
 
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.servicemarketplace.api.dto.RejectServiceRequest;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
@@ -19,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -108,8 +110,8 @@ public class ServiceController
 	@Operation(summary = "Cambia el estado de un servicio a REJECTED")
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("/admin/services/{id}/reject")
-	public ResponseEntity<String> rejectService(@PathVariable Long id) {
-		serviceService.markAsRejected(id);
+	public ResponseEntity<String> rejectService(@PathVariable Long id, @Valid @RequestBody RejectServiceRequest body) {
+		serviceService.markAsRejected(id, body.serviceRejectCauseId());
 		return ResponseEntity.ok().build();
 	}
 

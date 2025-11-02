@@ -41,6 +41,10 @@ public class Service
 	private ServiceStatus status = ServiceStatus.PENDING;
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdDate = LocalDateTime.now();
+	@ManyToOne
+	@JoinColumn(name = "service_reject_cause_id")
+	private ServiceRejectCause serviceRejectCause;
+
 	@PrePersist
 	public void prePersist() {
 		this.createdDate = LocalDateTime.now();

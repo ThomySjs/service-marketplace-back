@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,11 +12,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.servicemarketplace.api.domain.entities.ServiceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.entities.Service;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.ServiceRepository;
+import com.servicemarketplace.api.domain.repositories.ServiceRejectCauseRepository;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
@@ -40,7 +41,8 @@ public class ServiceServiceImpl implements ServiceService {
     private final UserService userService;
     private final CategoryService categoryService;
     private final ImageService imageService;
-	 private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+    private final ServiceRejectCauseRepository serviceRejectCauseRepository;
 
     @Override
     public ServiceCreatedDTO create(ServiceDTO request){
@@ -206,11 +208,23 @@ public class ServiceServiceImpl implements ServiceService {
 	}
 
 	@Override
-	public void markAsRejected(Long id)
+	@Transactional
+	public void markAsRejected(Long id, Long serviceRejectCauseId)
 	{
 		var serviceForRejection = serviceRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No se encontro el servicio con id " + id));
-		serviceForRejection.setStatus(ServiceStatus.REJECTED);
-		serviceRepository.save(serviceForRejection);
+
+        // Buscar la causa de rechazo
+        var cause = serviceRejectCauseRepository.findById(serviceRejectCauseId)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontro la causa de rechazo con id " + serviceRejectCauseId));
+
+        // Marcar servicio como REJECTED
+        serviceForRejection.setStatus(ServiceStatus.REJECTED);
+
+        // Asociar la causa al servicio
+        serviceForRejection.setServiceRejectCause(cause);
+
+        // Guardar cambios en servicio
+        serviceRepository.save(serviceForRejection);
 	}
 
 	@Override
@@ -290,10 +304,27 @@ public class ServiceServiceImpl implements ServiceService {
 				statusArray.add(node);
 			}
 
-			// --- 3️⃣ Combinar ambos en un solo JSON ---
+			// --- 3️⃣ Nuevo dataset: rechazados agrupados por causa ---
+			List<Object[]> rejectedByCauseResults = serviceRepository.findRejectedCountByCauseFromDate(fromDate);
+			ArrayNode rejectedByCauseArray = objectMapper.createArrayNode();
+			for (Object[] row : rejectedByCauseResults) {
+				Number idNum = (Number) row[0];
+				Long causeId = idNum == null ? null : idNum.longValue();
+				String message = (String) row[1];
+				long count = ((Number) row[2]).longValue();
+
+				ObjectNode node = objectMapper.createObjectNode();
+				if (causeId != null) node.put("id", causeId);
+				node.put("message", message);
+				node.put("count", count);
+				rejectedByCauseArray.add(node);
+			}
+
+			// --- 4️⃣ Combinar todos en un solo JSON ---
 			ObjectNode root = objectMapper.createObjectNode();
 			root.set("porMes", monthlyArray);
 			root.set("porEstado", statusArray);
+			root.set("rechazadosPorCausa", rejectedByCauseArray);
 
 			return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
 		} catch (Exception e) {

@@ -37,7 +37,7 @@ public interface ServiceService {
 
 	 void markAsApproved(Long id);
 
-	 void markAsRejected(Long id);
+	 void markAsRejected(Long id, Long serviceRejectCauseId);
 
 	 String getMetrics();
 
