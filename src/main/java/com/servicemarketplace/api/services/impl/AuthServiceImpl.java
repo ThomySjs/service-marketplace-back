@@ -154,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Genera tokens
         RefreshToken refreshToken = refreshTokenServiceImpl.createToken(user.getEmail());
-        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession());
+        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession(), Map.of("name", user.getName(), "role", user.getRole()));
 
         return new TokenResponse(sessionToken, refreshToken.getToken());
     }
