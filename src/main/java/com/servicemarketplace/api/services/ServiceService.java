@@ -32,4 +32,13 @@ public interface ServiceService {
     ServiceCreatedDTO update(ServiceDTO request);
 
     ServiceDetailsResponse getServiceDetails(Long id);
+
+	 Page<ServiceListResponse> getByStatusPendingForBO(Pageable pageable);
+
+	 void markAsApproved(Long id);
+
+	 void markAsRejected(Long id, Long serviceRejectCauseId);
+
+	 String getMetrics();
+
 }

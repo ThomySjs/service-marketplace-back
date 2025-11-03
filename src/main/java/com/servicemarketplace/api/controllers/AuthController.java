@@ -70,6 +70,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @Operation(summary = "Valida las credenciales del admin y genera tokens de acceso si tiene rol ADMIN.")
+    @PostMapping("/admin/login")
+    @ResponseBody
+    public ResponseEntity<TokenResponse> adminLogin(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.loginAdmin(request));
+    }
+
     @Operation(summary = "Verifica el correo electronico del usuario.")
     @GetMapping("/verify")
     public String verify(@RequestParam("token") String token, Model model) {

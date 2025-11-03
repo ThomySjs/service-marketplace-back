@@ -1,5 +1,7 @@
 package com.servicemarketplace.api.domain.repositories;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import com.servicemarketplace.api.dto.service.ServiceListResponse;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
+
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
               s.id,
@@ -102,4 +105,52 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
        Optional<ServiceDetailsResponse> getServiceDetailsNotDeleted(@Param("id") Long id);
 
        Optional<Service> findByIdAndDeletedFalse(Long id);
+
+		 @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price,
+              s.description)
+              FROM Service s
+              WHERE s.deleted = false
+              AND s.status = 'PENDING'
+              ORDER BY s.createdDate ASC
+              """)
+		 Page<ServiceListResponse> findByStatusPending(Pageable pageable);
+
+		@Query("""
+			  SELECT 
+					YEAR(s.createdDate) AS year,
+					MONTH(s.createdDate) AS month,
+					s.status AS status,
+					COUNT(s) AS count
+			  FROM Service s
+			  WHERE s.createdDate >= :fromDate
+			  GROUP BY YEAR(s.createdDate), MONTH(s.createdDate), s.status
+			  ORDER BY YEAR(s.createdDate), MONTH(s.createdDate)
+		 """)
+		List<Object[]> findServiceStatsFromDate(LocalDateTime fromDate);
+
+		@Query("""
+		 SELECT s.status, COUNT(s)
+		 FROM Service s
+		 WHERE s.createdDate >= :fromDate
+		 GROUP BY s.status
+		""")
+		List<Object[]> findServiceCountByStatusFromDate(LocalDateTime fromDate);
+
+		@Query("""
+		 SELECT c.id, c.message, COUNT(s)
+		 FROM Service s
+		 JOIN s.serviceRejectCause c
+		 WHERE s.createdDate >= :fromDate
+		 AND s.status = 'REJECTED'
+		 GROUP BY c.id, c.message
+		 ORDER BY COUNT(s) DESC
+		""")
+		List<Object[]> findRejectedCountByCauseFromDate(LocalDateTime fromDate);
+
 }
