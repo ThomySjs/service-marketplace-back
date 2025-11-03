@@ -39,8 +39,8 @@ public class Service
 	@Column(nullable = false)
 	@Builder.Default
 	private ServiceStatus status = ServiceStatus.PENDING;
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdDate = LocalDateTime.now();
+	@Column(nullable = false, updatable = false, columnDefinition = "DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)")
+	private LocalDateTime createdDate;
 	@ManyToOne
 	@JoinColumn(name = "service_reject_cause_id")
 	private ServiceRejectCause serviceRejectCause;
