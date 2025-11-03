@@ -132,6 +132,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    public TokenResponse loginAdmin(LoginRequest request) {
+        // Autentica credenciales
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        var userOpt = userRepository.findByEmail(request.email());
+        if (userOpt.isEmpty()) {
+            throw new IllegalArgumentException("Usuario o contraseña inválidos.");
+        }
+        User user = userOpt.get();
+
+        // Verifica si el usuario confirmo su correo y si la opcion de correos esta habilitada
+        if (!user.isVerified() && mailConfig.isEnabled()) {
+            mailService.sendConfirmationEmail(user.getEmail(), routeService.getAppUrl(), user.getName());
+            throw new UserNotVerifiedException("Correo electronico no confirmado.");
+        }
+
+        // Verifica rol ADMIN
+        if (!user.isAdmin()) {
+            throw new IllegalArgumentException("Acceso denegado. El usuario no tiene rol ADMIN.");
+        }
+
+        // Genera tokens
+        RefreshToken refreshToken = refreshTokenServiceImpl.createToken(user.getEmail());
+        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession());
+
+        return new TokenResponse(sessionToken, refreshToken.getToken());
+    }
+
+    @Override
     public Map<?, ?> verify(String token) {
         //Parsea el token, comprueba su expiracion y verifica el tipo de token
         try {
