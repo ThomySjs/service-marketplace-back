@@ -48,6 +48,12 @@ public class ServiceServiceImpl implements ServiceService {
     public ServiceCreatedDTO create(ServiceDTO request){
         //Obtener el usuario
         User user = userService.getUserFromContext();
+        List<Service> services = serviceRepository.findBySellerAndDeletedFalse(user);
+
+        Long serviceLimit = user.isPremium() ? Roles.PREMIUM.getServiceLimit() : Roles.USER.getServiceLimit();
+        if (services.size() >= serviceLimit) {
+            throw new InvalidOperationException("Has alcanzado el limite de servicios activos.");
+        }
 
         //Obtener la categoria
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -335,5 +341,17 @@ public class ServiceServiceImpl implements ServiceService {
 	private String capitalize(String s) {
 		if (s == null || s.isEmpty()) return s;
 		return s.substring(0, 1).toUpperCase() + s.substring(1);
+	}
+
+    public User disableExtraServices(User user) {
+        List<Service> services = user.getServices();
+
+        services.stream()
+                .max(Comparator.comparing(Service::getCreatedDate))
+                .ifPresent(newest ->
+                        services.forEach(s -> s.setDeleted(!s.equals(newest)))
+                );
+
+        return user;
 	}
 }

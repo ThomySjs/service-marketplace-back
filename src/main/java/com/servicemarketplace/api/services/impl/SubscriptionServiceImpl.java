@@ -41,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
+    private final ServiceServiceImpl serviceServiceImpl;
+
     private final JwtUtils jwtUtils;
     private final UrlConfig urlConfig;
     private final SubscriptionRepository subscriptionRepository;
@@ -235,6 +237,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (subscription.getEndDate().isBefore(LocalDateTime.now())) {
             user.setRole(Roles.USER.name());
+            user = serviceServiceImpl.disableExtraServices(user);
             return userRepository.save(user);
         }
 
