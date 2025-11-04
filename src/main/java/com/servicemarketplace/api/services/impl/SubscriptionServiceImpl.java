@@ -145,7 +145,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         PreapprovalCreateRequest preapproval =
             PreapprovalCreateRequest.builder()
                 .autoRecurring(preapprovalAutoRecurring)
-                .payerEmail("test_user_2815945483544106121@testuser.com")
+                .payerEmail(user.getEmail())
                 .backUrl(urlConfig.getFrontendUrl() + "services")
                 .reason(foundMembership.getName())
                 .externalReference(savedSubscription.getId().toString())
