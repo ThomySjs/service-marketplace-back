@@ -3,7 +3,7 @@ package com.servicemarketplace.api.dto.user;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.service.ServiceListResponseWithStatus;
 
 import lombok.Builder;
 
@@ -16,6 +16,6 @@ public record UserDTO(
     String address,
     String phone,
     LocalDateTime createdAt,
-    List<ServiceListResponse> createdServices
+    List<ServiceListResponseWithStatus> createdServices
 ) {
 }

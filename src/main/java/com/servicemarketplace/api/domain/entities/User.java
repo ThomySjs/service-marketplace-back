@@ -6,6 +6,7 @@ import java.util.List;
 import com.servicemarketplace.api.config.Roles;
 import com.servicemarketplace.api.dto.user.UpdateUserDTO;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,7 +45,7 @@ public class User {
     private String role = Roles.USER.name();
     private LocalDateTime createdAt;
     private Long zoneId;
-    @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Service> services;
     @Builder.Default
     private boolean deleted = false;
@@ -56,6 +57,10 @@ public class User {
 
     public boolean isAdmin() {
         return this.role.equals(Roles.ADMIN.name());
+    }
+
+    public boolean isPremium() {
+        return this.role.equals(Roles.PREMIUM.name());
     }
 
     public void fromDTO(UpdateUserDTO dto) {
