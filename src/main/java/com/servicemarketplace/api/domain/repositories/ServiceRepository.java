@@ -32,6 +32,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.seller = :seller
               AND s.status = :status
+              AND s.disabled = false
               """)
        Page<ServiceListResponse> findBySeller(@Param("seller") User seller, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -47,6 +48,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.category.id IN :category
               AND s.status = :status
+              AND s.disabled = false
               """)
        Page<ServiceListResponse> findByCategory(@Param("category") String[] category, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -62,6 +64,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.title LIKE %:title%
               AND s.status = :status
+              AND s.disabled = false
               """)
        Page<ServiceListResponse> findByTitle(@Param("title") String title, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -78,6 +81,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.category.id IN :category
               AND s.title LIKE %:title%
               AND s.status = :status
+              AND s.disabled = false
               """)
        Page<ServiceListResponse> findByCategoryAndTitleNotDeleted(@Param("category") String[] category, @Param("title") String title, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -92,6 +96,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.deleted = false
               AND s.status = :status
+              AND s.disabled = false
               """)
        Page<ServiceListResponse> findAllNotDeleted(Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -108,6 +113,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.id = :id
               AND s.status = :status
+              AND s.disabled = false
               """)
        Optional<ServiceDetailsResponse> getServiceDetailsNotDeleted(@Param("id") Long id, @Param("status") ServiceStatus status);
 
@@ -123,12 +129,13 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.deleted = false
               AND s.id = :id
+              AND s.disabled = false
               """)
        Optional<ServiceDetailsResponse> getServiceDetailsNotDeletedAdmin(@Param("id") Long id);
 
-       Optional<Service> findByIdAndDeletedFalse(Long id);
+       Optional<Service> findByIdAndDeletedFalseAndDisabledFalse(Long id);
 
-       List<Service> findBySellerAndDeletedFalse(User user);
+       List<Service> findBySellerAndDeletedFalseAndDisabledFalse(User user);
 
        @Query("""
               SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse( +
@@ -141,6 +148,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.deleted = false
               AND s.status = 'PENDING'
+              AND s.disabled = false
               ORDER BY s.createdDate ASC
        """)
        Page<ServiceListResponse> findByStatusPending(Pageable pageable);
@@ -154,6 +162,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.createdDate >= :fromDate
               AND s.deleted = false
+              AND s.disabled = false
               GROUP BY YEAR(s.createdDate), MONTH(s.createdDate), s.status
               ORDER BY YEAR(s.createdDate), MONTH(s.createdDate)
        """)
@@ -164,6 +173,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               FROM Service s
               WHERE s.createdDate >= :fromDate
               AND s.deleted = false
+              AND s.disabled = false
               GROUP BY s.status
        """)
        List<Object[]> findServiceCountByStatusFromDate(LocalDateTime fromDate);
@@ -175,6 +185,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.createdDate >= :fromDate
               AND s.status = 'REJECTED'
               AND s.deleted = false
+              AND s.disabled = false
               GROUP BY c.id, c.message
               ORDER BY COUNT(s) DESC
        """)

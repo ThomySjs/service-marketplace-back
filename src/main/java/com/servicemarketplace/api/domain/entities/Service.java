@@ -33,6 +33,8 @@ public class Service
 	private Double price = 0.0;
 	@Builder.Default
 	private boolean deleted = false;
+	@Builder.Default
+	private boolean disabled = false;
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	@Builder.Default

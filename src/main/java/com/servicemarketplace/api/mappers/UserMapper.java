@@ -20,7 +20,7 @@ public class UserMapper {
             .phone(user.getPhone())
             .createdAt(user.getCreatedAt())
             .createdServices(user.getServices().stream()
-                .filter(s -> !s.isDeleted())
+                .filter(s -> !s.isDeleted() && !s.isDisabled())
                 .map(s -> new ServiceListResponseWithStatus(
                 s.getId(),
                 s.getCategory().getTitle(),

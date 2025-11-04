@@ -32,6 +32,7 @@ import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.transaction.SubscriptionDTO;
 import com.servicemarketplace.api.dto.transaction.SubscriptionResponseDTO;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
+import com.servicemarketplace.api.services.ServiceService;
 import com.servicemarketplace.api.services.SubscriptionService;
 import com.servicemarketplace.api.services.UserService;
 
@@ -50,6 +51,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final MembershipRepository membershipRepository;
+    private final ServiceService serviceService;
+
 
     @Override
     public SubscriptionResponseDTO create(SubscriptionDTO dto) {
@@ -142,7 +145,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         PreapprovalCreateRequest preapproval =
             PreapprovalCreateRequest.builder()
                 .autoRecurring(preapprovalAutoRecurring)
-                .payerEmail(user.getEmail())
+                .payerEmail("test_user_2815945483544106121@testuser.com")
                 .backUrl(urlConfig.getFrontendUrl() + "services")
                 .reason(foundMembership.getName())
                 .externalReference(savedSubscription.getId().toString())
@@ -210,6 +213,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (status.equals("approved")) {
             user.setRole(Roles.PREMIUM.name());
+            user = serviceService.restoreDisabledServices(user);
             foundSubscription.setEndDate(LocalDateTime.now().plusMonths(1));
         } else if ((status.equals("rejected") || status.equals("cancelled")) && user.getRole().equals(Roles.PREMIUM.name())) {
             user.setRole(Roles.USER.name());
