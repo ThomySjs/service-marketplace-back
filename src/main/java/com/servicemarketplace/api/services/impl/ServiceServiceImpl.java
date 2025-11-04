@@ -49,7 +49,7 @@ public class ServiceServiceImpl implements ServiceService {
     public ServiceCreatedDTO create(ServiceDTO request){
         //Obtener el usuario
         User user = userService.getUserFromContext();
-        List<Service> services = serviceRepository.findBySellerAndDeletedFalse(user);
+        List<Service> services = serviceRepository.findBySellerAndDeletedFalseAndDisabledFalse(user);
 
         Long serviceLimit = user.isPremium() ? Roles.PREMIUM.getServiceLimit() : Roles.USER.getServiceLimit();
         if (services.size() >= serviceLimit) {
@@ -108,7 +108,7 @@ public class ServiceServiceImpl implements ServiceService {
         if (id == null) {
             throw new IllegalArgumentException("La id del servicio no puede ser nula.");
         }
-        Optional<Service> service = serviceRepository.findByIdAndDeletedFalse(id);
+        Optional<Service> service = serviceRepository.findByIdAndDeletedFalseAndDisabledFalse(id);
         if (service.isEmpty()) {
             throw new ResourceNotFoundException("El servicio no existe.");
         }
@@ -359,15 +359,29 @@ public class ServiceServiceImpl implements ServiceService {
 		return s.substring(0, 1).toUpperCase() + s.substring(1);
 	}
 
+    @Override
     public User disableExtraServices(User user) {
         List<Service> services = user.getServices();
 
         services.stream()
                 .max(Comparator.comparing(Service::getCreatedDate))
                 .ifPresent(newest ->
-                        services.forEach(s -> s.setDeleted(!s.equals(newest)))
+                        services.forEach(s -> s.setDisabled(!s.equals(newest)))
                 );
 
         return user;
+    }
+
+    @Override
+    public User restoreDisabledServices(User user) {
+        List<Service> services = user.getServices();
+
+        services.stream()
+            .filter(s -> s.isDisabled() && !s.isDeleted())
+            .forEach(s -> s.setDisabled(false));
+
+        user.setServices(services);
+        return user;
+
     }
 }

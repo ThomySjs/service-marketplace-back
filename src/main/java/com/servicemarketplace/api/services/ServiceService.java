@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.servicemarketplace.api.domain.entities.Service;
+import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
@@ -42,5 +43,9 @@ public interface ServiceService {
 	 void markAsRejected(Long id, Long serviceRejectCauseId);
 
 	 String getMetrics();
+
+    public User disableExtraServices(User user);
+
+    public User restoreDisabledServices(User user);
 
 }
