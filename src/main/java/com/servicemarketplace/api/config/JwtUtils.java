@@ -2,6 +2,7 @@ package com.servicemarketplace.api.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.crypto.SecretKey;
@@ -103,12 +104,13 @@ public class JwtUtils {
             .compact();
     }
 
-    public String generateSessionToken(String subject, String session) {
+    public String generateSessionToken(String subject, String session, Map<String, String> extraData) {
         return Jwts.builder()
             .signWith(key)
             .subject(subject)
             .claim("type", TokenTypes.SESSION.getType())
             .claim("session", session)
+            .claim("extra_data", extraData)
             .expiration(new Date(new Date().getTime() + TokenTypes.SESSION.getExpTime()))
             .compact();
     }

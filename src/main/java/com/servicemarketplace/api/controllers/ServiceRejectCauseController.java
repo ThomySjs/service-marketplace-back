@@ -16,13 +16,13 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/service-reject-causes")
+@RequestMapping("/admin/service-reject-causes")
 public class ServiceRejectCauseController {
 
     private final ServiceRejectCauseService service;
 
     @Operation(summary = "Obtiene todas las causas de rechazo de servicio.")
-	 @PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ServiceRejectCauseDTO>> getAll() {
         return ResponseEntity.ok(service.getAll());

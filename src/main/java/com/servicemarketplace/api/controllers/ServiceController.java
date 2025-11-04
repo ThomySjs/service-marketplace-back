@@ -32,7 +32,7 @@ public class ServiceController
 	private final ServiceService serviceService;
 
 	@Operation(summary = "Crea un servicio.")
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/services", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ServiceCreatedDTO> createService(@ModelAttribute ServiceDTO request)
 	{
 		return ResponseEntity.ok(serviceService.create(request));
@@ -76,6 +76,7 @@ public class ServiceController
 		return ResponseEntity.ok(serviceService.getServiceDetails(id));
 	}
 
+
 	@Operation(summary = "Borra un servicio.")
 	@DeleteMapping("/services/{id}")
 	public ResponseEntity<String> deleteService(@PathVariable Long id)
@@ -97,6 +98,13 @@ public class ServiceController
 	@GetMapping("/admin/services")
 	public ResponseEntity<Page<ServiceListResponse>> getServicesForAdminView(Pageable pageable) {
 		return ResponseEntity.ok(serviceService.getByStatusPendingForBO(pageable));
+	}
+
+	@Operation(summary = "Obtiene los detalles de un servicio")
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/admin/services/details/{id}")
+	public ResponseEntity<ServiceDetailsResponse> getServiceDetailsAdmin(@PathVariable Long id) {
+		return ResponseEntity.ok(serviceService.getServiceDetailsForAdmin(id));
 	}
 
 	@Operation(summary = "Cambia el estado de un servicio a APPROVED")

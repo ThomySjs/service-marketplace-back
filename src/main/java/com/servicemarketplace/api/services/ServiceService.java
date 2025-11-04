@@ -25,6 +25,8 @@ public interface ServiceService {
 
     Page<ServiceListResponse> getAllNotDeleted(Pageable pageable);
 
+    public ServiceDetailsResponse getServiceDetailsForAdmin(Long id);
+
     void validateServiceOwner(Service service);
 
     void deleteById(Long id);

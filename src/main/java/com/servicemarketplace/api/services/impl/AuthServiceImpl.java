@@ -24,6 +24,7 @@ import com.servicemarketplace.api.dto.auth.RecoveryCodeDTO;
 import com.servicemarketplace.api.dto.auth.RegisterRequest;
 import com.servicemarketplace.api.dto.auth.RegisterResponse;
 import com.servicemarketplace.api.dto.auth.TokenResponse;
+import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.exceptions.auth.UserNotVerifiedException;
 import com.servicemarketplace.api.services.AuthService;
 import com.servicemarketplace.api.services.EmailService;
@@ -52,7 +53,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
-
         User newUser = User.builder()
             .name(request.name())
             .email(request.email())
@@ -92,7 +92,18 @@ public class AuthServiceImpl implements AuthService {
         if (refreshToken == null) {
             throw new JwtException("Refresh token invalido");
         }
-        String sessionToken = jwtUtils.generateSessionToken(email, refreshToken.getSession());
+
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado.");
+        }
+
+        User foundUser = user.get();
+        String sessionToken = jwtUtils.generateSessionToken(
+            email,
+            refreshToken.getSession(),
+            Map.of("name", foundUser.getName(), "role", foundUser.getRole())
+        );
 
         return new TokenResponse(sessionToken, refreshToken.getToken());
     }
@@ -110,7 +121,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         RefreshToken refreshToken = refreshTokenServiceImpl.createToken(user.getEmail());
-        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession());
+        String sessionToken = jwtUtils.generateSessionToken(
+            user.getEmail(),
+            refreshToken.getSession(),
+            Map.of("name", user.getName(), "role", user.getRole())
+            );
 
 
         return new TokenResponse(sessionToken, refreshToken.getToken());
@@ -139,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Genera tokens
         RefreshToken refreshToken = refreshTokenServiceImpl.createToken(user.getEmail());
-        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession());
+        String sessionToken = jwtUtils.generateSessionToken(user.getEmail(), refreshToken.getSession(), Map.of("name", user.getName(), "role", user.getRole()));
 
         return new TokenResponse(sessionToken, refreshToken.getToken());
     }

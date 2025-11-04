@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.servicemarketplace.api.config.Roles;
 import com.servicemarketplace.api.domain.entities.Category;
 import com.servicemarketplace.api.domain.entities.Service;
 import com.servicemarketplace.api.domain.entities.User;
@@ -48,6 +49,12 @@ public class ServiceServiceImpl implements ServiceService {
     public ServiceCreatedDTO create(ServiceDTO request){
         //Obtener el usuario
         User user = userService.getUserFromContext();
+        List<Service> services = serviceRepository.findBySellerAndDeletedFalse(user);
+
+        Long serviceLimit = user.isPremium() ? Roles.PREMIUM.getServiceLimit() : Roles.USER.getServiceLimit();
+        if (services.size() >= serviceLimit) {
+            throw new InvalidOperationException("Has alcanzado el limite de servicios activos.");
+        }
 
         //Obtener la categoria
         Category category = categoryService.getCategoryById(request.categoryId());
@@ -73,27 +80,27 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public Page<ServiceListResponse> getBySeller(Long id, Pageable pageable) {
         User seller = userService.getUserById(id);
-        return serviceRepository.findBySeller(seller, pageable);
+        return serviceRepository.findBySeller(seller, pageable, ServiceStatus.APPROVED);
     }
 
     @Override
     public Page<ServiceListResponse> getByCategory(String[] categoryId, Pageable pageable) {
-        return serviceRepository.findByCategory(categoryId, pageable);
+        return serviceRepository.findByCategory(categoryId, pageable, ServiceStatus.APPROVED);
     }
 
     @Override
     public Page<ServiceListResponse> getByTitle(String title, Pageable pageable) {
-        return serviceRepository.findByTitle(title, pageable);
+        return serviceRepository.findByTitle(title, pageable, ServiceStatus.APPROVED);
     }
 
     @Override
     public Page<ServiceListResponse> getByCategoryAndTitle(String[] category, String title, Pageable pageable) {
-        return serviceRepository.findByCategoryAndTitleNotDeleted(category, title, pageable);
+        return serviceRepository.findByCategoryAndTitleNotDeleted(category, title, pageable, ServiceStatus.APPROVED);
     }
 
     @Override
     public Page<ServiceListResponse> getAllNotDeleted(Pageable pageable) {
-        return serviceRepository.findAllNotDeleted(pageable);
+        return serviceRepository.findAllNotDeleted(pageable, ServiceStatus.APPROVED);
     }
 
     @Override
@@ -175,6 +182,7 @@ public class ServiceServiceImpl implements ServiceService {
         service.setTitle(request.title());
         service.setDescription(request.description());
         service.setPrice(request.price());
+        service.setStatus(ServiceStatus.PENDING);
 
         return ServiceMapper.toServiceCreatedDTO(serviceRepository.save(service));
     }
@@ -185,7 +193,21 @@ public class ServiceServiceImpl implements ServiceService {
             throw new IllegalArgumentException("La id no puede ser nula.");
         }
 
-        Optional<ServiceDetailsResponse> details = serviceRepository.getServiceDetailsNotDeleted(id);
+        Optional<ServiceDetailsResponse> details = serviceRepository.getServiceDetailsNotDeleted(id, ServiceStatus.APPROVED);
+        if (details.isEmpty()) {
+            throw new ResourceNotFoundException("El servicio no existe o fue eliminado.");
+        }
+
+        return details.get();
+    }
+
+    @Override
+    public ServiceDetailsResponse getServiceDetailsForAdmin(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("La id no puede ser nula.");
+        }
+
+        Optional<ServiceDetailsResponse> details = serviceRepository.getServiceDetailsNotDeletedAdmin(id);
         if (details.isEmpty()) {
             throw new ResourceNotFoundException("El servicio no existe o fue eliminado.");
         }
@@ -237,7 +259,7 @@ public class ServiceServiceImpl implements ServiceService {
 		try {
 			LocalDateTime fromDate = LocalDate.now().minusMonths(12).atStartOfDay();
 
-			// --- 1️⃣ Primer dataset: por mes y estado (el que ya tenías) ---
+			//  Primer dataset: por mes y estado
 			List<Object[]> monthlyResults = serviceRepository.findServiceStatsFromDate(fromDate);
 
 			Map<String, Map<ServiceStatus, Long>> groupedByMonth = new LinkedHashMap<>();
@@ -272,7 +294,7 @@ public class ServiceServiceImpl implements ServiceService {
 				monthlyArray.add(node);
 			});
 
-			// --- 2️⃣ Segundo dataset: agrupado solo por estado ---
+			// Segundo dataset: agrupado solo por estado
 			List<Object[]> statusResults = serviceRepository.findServiceCountByStatusFromDate(fromDate);
 
 			ArrayNode statusArray = objectMapper.createArrayNode();
@@ -304,7 +326,7 @@ public class ServiceServiceImpl implements ServiceService {
 				statusArray.add(node);
 			}
 
-			// --- 3️⃣ Nuevo dataset: rechazados agrupados por causa ---
+			// Nuevo dataset: rechazados agrupados por causa
 			List<Object[]> rejectedByCauseResults = serviceRepository.findRejectedCountByCauseFromDate(fromDate);
 			ArrayNode rejectedByCauseArray = objectMapper.createArrayNode();
 			for (Object[] row : rejectedByCauseResults) {
@@ -320,7 +342,7 @@ public class ServiceServiceImpl implements ServiceService {
 				rejectedByCauseArray.add(node);
 			}
 
-			// --- 4️⃣ Combinar todos en un solo JSON ---
+			// Combinar todos en un solo JSON
 			ObjectNode root = objectMapper.createObjectNode();
 			root.set("porMes", monthlyArray);
 			root.set("porEstado", statusArray);
@@ -336,4 +358,16 @@ public class ServiceServiceImpl implements ServiceService {
 		if (s == null || s.isEmpty()) return s;
 		return s.substring(0, 1).toUpperCase() + s.substring(1);
 	}
+
+    public User disableExtraServices(User user) {
+        List<Service> services = user.getServices();
+
+        services.stream()
+                .max(Comparator.comparing(Service::getCreatedDate))
+                .ifPresent(newest ->
+                        services.forEach(s -> s.setDeleted(!s.equals(newest)))
+                );
+
+        return user;
+    }
 }
