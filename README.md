@@ -1,6 +1,11 @@
 # Service Marketplace - Backend
 
-API REST para un marketplace de servicios (Spring Boot).
+## Descripción
+API REST para marketplace de servicios cuyo propósito es brindar un medio centralizado para que emprendedores y PYMES puedan alcanzar a más clientes.
+
+Este repositorio contiene el backend.
+
+Para ver el repositorio del frontend, [Click aquí](https://github.com/ffleita/service-marketplace-front)
 
 ## Requisitos
 
