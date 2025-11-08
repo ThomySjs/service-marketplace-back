@@ -13,6 +13,7 @@ import com.servicemarketplace.api.services.ServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -75,6 +76,14 @@ public class ServiceController
 	{
 		return ResponseEntity.ok(serviceService.getServiceDetails(id));
 	}
+
+	@Operation(summary = "Obtiene los servicios destacados.")
+	@GetMapping("/services/featured")
+	public ResponseEntity<List<ServiceListResponse>> getServiceDetails(@RequestParam("limit") Integer limit)
+	{
+		return ResponseEntity.ok(serviceService.getFeaturedServices(limit));
+	}
+
 
 
 	@Operation(summary = "Borra un servicio.")

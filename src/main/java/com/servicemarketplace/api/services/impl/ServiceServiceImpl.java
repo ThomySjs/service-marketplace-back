@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.servicemarketplace.api.domain.entities.ServiceStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -383,5 +384,22 @@ public class ServiceServiceImpl implements ServiceService {
         user.setServices(services);
         return user;
 
+    }
+
+    @Override
+    public List<ServiceListResponse> getFeaturedServices(Integer limit) {
+
+        //Trae registros aleatorios de aquellos servicios cuyo usuario sea PREMIUM
+        List<ServiceListResponse> featuredPremiumServices = serviceRepository.getRandomFeaturedServices(PageRequest.of(0, limit)).getContent();
+        List<ServiceListResponse> result = new ArrayList<>(featuredPremiumServices);
+
+        //Si no hay suficientes registros para completar la lista, completa con servicios de usuarios no premium
+        if (result.size() < limit) {
+            Integer missingServices = limit - result.size();
+            List<ServiceListResponse>  featuredUserServices = serviceRepository.getRandomServices(PageRequest.of(0, missingServices)).getContent();
+            result.addAll(featuredUserServices);
+        }
+
+        return result;
     }
 }
