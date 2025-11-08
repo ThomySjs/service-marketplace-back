@@ -22,6 +22,11 @@
 
 ---
 
+## Diagrama de base de datos
+![Diagrama](./img/DBD.png)
+
+---
+
 ## Requisitos Funcionales
 
 ### RF-01: Registro de usuario
@@ -431,4 +436,26 @@ Los siguientes casos de uso describen las interacciones entre los actores y el s
 - El usuario obtiene o mantiene el estado Premium según el resultado de la transacción.
 
 
+## Logros y tareas pendientes
+
+### Logros
+
+Como parte de los logros podemos destacar las integraciones con Mercado Pago y gran parte del desarrollo del frontend, ya que es la primera vez que integramos pagos en un proyecto y ambos somos desarrolladores orientados al backend, por lo que la toma de decisiones en cuanto al diseño y desarrollo del frontend fue un desafío. <br>
+Otro punto positivo es la división de tareas utilizando una metodología ágil (Kanban), la cual ayudó a organizar y agilizar el proceso de desarrollo; además, facilitó la inclusión de nuevas funcionalidades y el seguimiento de las mismas.
+
+Imagen del tablero
+![Tablero](./img/Kanban.png)
+
+### Tareas pendientes
+
+El proyecto alcanzó el MVP; sin embargo, quedaron ciertas funcionalidades extras que se irán implementando en la medida en que el tiempo de entrega lo permita. Algunas de las funcionalidades son:
+
+- Mapa con la ubicación aproximada del servicio (Frontend)
+- Integración con API de georef para el manejo de direcciones (Backend)
+- Lógica de bloqueo de usuarios para administradores
+
+
+### Conclusión
+
+Participar en este proyecto nos permitió tener una visión más realista de lo que significa gestionar un proyecto desde cero, utilizando herramientas y frameworks estandarizados que permitieron un desarrollo fluido que, si bien tuvo sus complicaciones, se pudo llevar adelante gracias al trabajo en equipo.
 
