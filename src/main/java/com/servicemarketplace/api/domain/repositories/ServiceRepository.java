@@ -33,6 +33,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.seller = :seller
               AND s.status = :status
               AND s.disabled = false
+              ORDER BY s.id DESC
               """)
        Page<ServiceListResponse> findBySeller(@Param("seller") User seller, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -49,6 +50,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.category.id IN :category
               AND s.status = :status
               AND s.disabled = false
+              ORDER BY s.id DESC
               """)
        Page<ServiceListResponse> findByCategory(@Param("category") String[] category, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -65,6 +67,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.title LIKE %:title%
               AND s.status = :status
               AND s.disabled = false
+              ORDER BY s.id DESC
               """)
        Page<ServiceListResponse> findByTitle(@Param("title") String title, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -82,6 +85,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.title LIKE %:title%
               AND s.status = :status
               AND s.disabled = false
+              ORDER BY s.id DESC
               """)
        Page<ServiceListResponse> findByCategoryAndTitleNotDeleted(@Param("category") String[] category, @Param("title") String title, Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -97,6 +101,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               WHERE s.deleted = false
               AND s.status = :status
               AND s.disabled = false
+              ORDER BY s.id DESC
               """)
        Page<ServiceListResponse> findAllNotDeleted(Pageable pageable, @Param("status") ServiceStatus status);
 
@@ -191,4 +196,38 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
        """)
        List<Object[]> findRejectedCountByCauseFromDate(LocalDateTime fromDate);
 
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse(
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price,
+              s.description)
+              FROM Service s
+              WHERE s.status = 'APPROVED'
+              AND s.deleted = false
+              AND s.disabled = false
+              AND s.seller.role = 'PREMIUM'
+              ORDER BY function('RAND')
+       """)
+       Page<ServiceListResponse> getRandomFeaturedServices(Pageable pageable);
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListResponse(
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price,
+              s.description)
+              FROM Service s
+              WHERE s.status = 'APPROVED'
+              AND s.deleted = false
+              AND s.disabled = false
+              AND s.seller.role != 'PREMIUM'
+              ORDER BY function('RAND')
+       """)
+       Page<ServiceListResponse> getRandomServices(Pageable pageable);
 }

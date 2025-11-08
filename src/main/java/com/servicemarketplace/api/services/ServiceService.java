@@ -1,5 +1,7 @@
 package com.servicemarketplace.api.services;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -47,5 +49,7 @@ public interface ServiceService {
     public User disableExtraServices(User user);
 
     public User restoreDisabledServices(User user);
+
+    public List<ServiceListResponse> getFeaturedServices(Integer limit);
 
 }
