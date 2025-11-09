@@ -5,7 +5,7 @@ FROM eclipse-temurin:24-jdk
 WORKDIR /app
 
 # Copiamos el JAR de la aplicación
-COPY target/service-marketplace-back-0.0.6-SNAPSHOT.jar app.jar
+COPY target/service-marketplace-back-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponemos el puerto de la app
 EXPOSE 8000
