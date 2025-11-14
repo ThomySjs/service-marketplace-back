@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -25,27 +26,33 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/categories")
+@RequestMapping()
 public class CategoryController {
 
     private final CategoryService categoryService;
 
     @Operation(summary = "Agrega una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping
+    @PostMapping("/admin/categories")
     public ResponseEntity<CategoryDTO> createCategory(@Validated @RequestBody CategoryDTO request) {
         return ResponseEntity.ok(categoryService.create(request));
     }
 
     @Operation(summary = "Obtiene todas las categorias.")
-    @GetMapping
+    @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    @Operation(summary = "Obtiene todas las categorias con paginacion.")
+    @GetMapping("/categories/paginated")
+    public ResponseEntity<?> getAllCategoriesByPage(Pageable pageable) {
+        return ResponseEntity.ok(categoryService.getPage(pageable));
+    }
+
     @Operation(summary = "Elimina una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @DeleteMapping("{id}")
+    @DeleteMapping("/admin/categories/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -53,7 +60,7 @@ public class CategoryController {
 
     @Operation(summary = "Edita una categoria.")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping
+    @PutMapping("/admin/categories")
     public ResponseEntity<CategoryDTO> updateCategory(@RequestBody CategoryDTO categoryRequest) {
         return ResponseEntity.ok(categoryService.update(categoryRequest));
     }

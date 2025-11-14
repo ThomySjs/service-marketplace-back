@@ -1,8 +1,9 @@
 package com.servicemarketplace.api.services.impl;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.servicemarketplace.api.domain.entities.Subscription;
@@ -52,8 +53,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionResponseDTO> getAll() {
-        return transactionRepository.getAll();
+    public Page<TransactionResponseDTO> getAll(Pageable pageable) {
+        return transactionRepository.getAll(pageable);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.servicemarketplace.api.services.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.servicemarketplace.api.domain.entities.Category;
@@ -57,6 +59,11 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public List<CategoryDTO> getAll() {
         return categoryRepository.findAllNotDeleted();
+    }
+
+    @Override
+    public Page<CategoryDTO> getPage(Pageable pageable) {
+        return categoryRepository.getPage(pageable);
     }
 
     @Override

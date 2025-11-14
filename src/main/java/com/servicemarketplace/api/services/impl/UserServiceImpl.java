@@ -2,16 +2,20 @@ package com.servicemarketplace.api.services.impl;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.servicemarketplace.api.config.Roles;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.user.UpdateUserDTO;
 import com.servicemarketplace.api.dto.user.UserDTO;
+import com.servicemarketplace.api.dto.user.UserForAdmin;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.mappers.UserMapper;
 import com.servicemarketplace.api.services.ImageService;
@@ -66,6 +70,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserForAdmin> getUserListForAdmin(Pageable pageable) {
+        return userRepository.getUserForAdmin(pageable);
+    }
+
+    @Override
     public UserDTO updateUser(@Valid UpdateUserDTO dto){
         //Obtiene el usuario del token
         User user = getUserFromContext();
@@ -98,5 +107,25 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return newImagePath;
+    }
+
+    @Override
+    public String swtichUserRole(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isEmpty()) {
+            throw new ResourceNotFoundException("Usuario no encontrado.");
+        }
+
+        User foundUser = user.get();
+
+        if (foundUser.isAdmin()) {
+            foundUser.setRole(Roles.USER.name());
+        } else {
+            foundUser.setRole(Roles.ADMIN.name());
+        }
+        userRepository.save(foundUser);
+
+        return "Se actualizo el rol del usuario a: " + (foundUser.getRole().equals(Roles.ADMIN.name()) ? "Administrador" : "Usuario");
     }
 }
