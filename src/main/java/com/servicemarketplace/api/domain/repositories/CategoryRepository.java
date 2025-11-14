@@ -3,6 +3,8 @@ package com.servicemarketplace.api.domain.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +22,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
        "WHERE c.deleted = false " +
        "ORDER BY c.title")
     List<CategoryDTO> findAllNotDeleted();
+
+    @Query("SELECT new com.servicemarketplace.api.dto.CategoryDTO(c.id, c.title, c.description) " +
+       "FROM categories c " +
+       "WHERE c.deleted = false ")
+    Page<CategoryDTO> getPage(Pageable pageable);
 
     @Query("SELECT c FROM categories c WHERE c.id = :id AND c.deleted = false")
     Optional<Category> findByIdNotDeleted(@Param("id") Long id);
