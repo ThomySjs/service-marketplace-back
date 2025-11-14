@@ -216,6 +216,8 @@ Las restricciones son limitaciones técnicas, legales o de recursos que afectan 
 - Las integraciones externas (por ejemplo, Mercado Pago o el servicio de envío de correos) deben seguir las políticas y limitaciones de sus respectivas APIs.
 - El almacenamiento de imágenes debe realizarse en un servicio seguro (Cloudinary).
 - Se debe llevar un registro de todas las transacciones realizadas por los usuarios.
+- Los usuarios gratuitos podrán mantener solo 1 servicio activo.
+- Los usuarios pagos podrán tener hasta 3 servicios activos.
 
 ---
 
