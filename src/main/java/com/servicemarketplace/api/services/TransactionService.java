@@ -1,6 +1,7 @@
 package com.servicemarketplace.api.services;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.servicemarketplace.api.domain.entities.Transaction;
 import com.servicemarketplace.api.dto.transaction.TransactionDTO;
@@ -10,7 +11,7 @@ public interface TransactionService {
 
     public TransactionResponseDTO create(TransactionDTO dto);
 
-    public List<TransactionResponseDTO> getAll();
+    public Page<TransactionResponseDTO> getAll(Pageable pageable);
 
     public Transaction getById(Long id);
 }
