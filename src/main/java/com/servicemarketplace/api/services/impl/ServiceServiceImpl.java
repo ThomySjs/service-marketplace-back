@@ -25,6 +25,7 @@ import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller;
 import com.servicemarketplace.api.exceptions.auth.InvalidOperationException;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.mappers.ServiceMapper;
@@ -189,6 +190,24 @@ public class ServiceServiceImpl implements ServiceService {
     }
 
     @Override
+    public Page<ServiceListWithStatusAndSeller> getAllServicesForBO(Pageable pageable, String title) {
+        if (title == null) {
+            return serviceRepository.getAllServicesForBO(pageable, ServiceStatus.PENDING);
+        }
+        return serviceRepository.getAllServicesForBoWithFilter(pageable, ServiceStatus.PENDING, title);
+    }
+
+    @Override
+    public void changeStatusToPending(Long id) {
+        Service service = serviceRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("El servicio no existe."));
+        if (service.getStatus() != ServiceStatus.PENDING) {
+            service.setStatus(ServiceStatus.PENDING);
+            serviceRepository.save(service);
+        }
+    }
+
+    @Override
     public ServiceDetailsResponse getServiceDetails(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("La id no puede ser nula.");
@@ -310,7 +329,7 @@ public class ServiceServiceImpl implements ServiceService {
 					case PENDING ->
 					{
 						node.put("label", "Pendientes");
-						node.put("color", "#0088FE");
+						node.put("color", "#FFA726");
 					}
 					case APPROVED ->
 					{
@@ -320,7 +339,7 @@ public class ServiceServiceImpl implements ServiceService {
 					case REJECTED ->
 					{
 						node.put("label", "Rechazados");
-						node.put("color", "#FF8042");
+						node.put("color", "#EF5350");
 					}
 				}
 				node.put("value", count);

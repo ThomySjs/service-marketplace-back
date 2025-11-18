@@ -16,6 +16,7 @@ import com.servicemarketplace.api.domain.entities.ServiceStatus;
 import com.servicemarketplace.api.domain.entities.User;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<Service, Long> {
@@ -230,4 +231,43 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               ORDER BY function('RAND')
        """)
        Page<ServiceListResponse> getRandomServices(Pageable pageable);
+
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller(
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price,
+              s.description,
+              s.seller.name,
+              s.status)
+              FROM Service s
+              WHERE s.deleted = false
+              AND s.disabled = false
+              AND s.status != :status
+              ORDER BY s.id DESC
+              """)
+       Page<ServiceListWithStatusAndSeller> getAllServicesForBO(Pageable pageable, @Param("status") ServiceStatus status);
+
+       @Query("""
+              SELECT new com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller(
+              s.id,
+              s.category.title,
+              s.imagePath,
+              s.title,
+              s.price,
+              s.description,
+              s.seller.name,
+              s.status)
+              FROM Service s
+              WHERE s.deleted = false
+              AND s.disabled = false
+              AND s.status != :status
+              AND s.title LIKE %:title%
+              ORDER BY s.id DESC
+              """)
+       Page<ServiceListWithStatusAndSeller> getAllServicesForBoWithFilter(Pageable pageable, @Param("status") ServiceStatus status, String title);
+
 }
