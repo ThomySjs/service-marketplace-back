@@ -11,6 +11,7 @@ import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller;
 
 public interface ServiceService {
 
@@ -28,6 +29,8 @@ public interface ServiceService {
 
     Page<ServiceListResponse> getAllNotDeleted(Pageable pageable);
 
+    void changeStatusToPending(Long id);
+
     public ServiceDetailsResponse getServiceDetailsForAdmin(Long id);
 
     void validateServiceOwner(Service service);
@@ -38,13 +41,15 @@ public interface ServiceService {
 
     ServiceDetailsResponse getServiceDetails(Long id);
 
-	 Page<ServiceListResponse> getByStatusPendingForBO(Pageable pageable);
+    Page<ServiceListWithStatusAndSeller> getAllServicesForBO(Pageable pageable, String title);
 
-	 void markAsApproved(Long id);
+    Page<ServiceListResponse> getByStatusPendingForBO(Pageable pageable);
 
-	 void markAsRejected(Long id, Long serviceRejectCauseId);
+    void markAsApproved(Long id);
 
-	 String getMetrics();
+    void markAsRejected(Long id, Long serviceRejectCauseId);
+
+    String getMetrics();
 
     public User disableExtraServices(User user);
 

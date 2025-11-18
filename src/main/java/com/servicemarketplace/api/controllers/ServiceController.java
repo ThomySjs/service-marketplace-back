@@ -8,6 +8,7 @@ import com.servicemarketplace.api.dto.service.ServiceCreatedDTO;
 import com.servicemarketplace.api.dto.service.ServiceDTO;
 import com.servicemarketplace.api.dto.service.ServiceDetailsResponse;
 import com.servicemarketplace.api.dto.service.ServiceListResponse;
+import com.servicemarketplace.api.dto.service.ServiceListWithStatusAndSeller;
 import com.servicemarketplace.api.services.ServiceService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,6 +102,20 @@ public class ServiceController
 		return ResponseEntity.ok(serviceService.update(request));
 	}
 
+	@Operation(summary = "Obtiene todos los servicios y sus estados")
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/admin/services/all")
+	public ResponseEntity<Page<ServiceListWithStatusAndSeller>> getAllServicesForAdminView(Pageable pageable, @RequestParam(value = "title", required = false) String title) {
+		return ResponseEntity.ok(serviceService.getAllServicesForBO(pageable, title));
+	}
+
+	@Operation(summary = "Vuelve un servicio a revisión")
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/admin/services/change-status/{id}")
+	public ResponseEntity<?> changeServiceStatusToPending(@PathVariable("id") Long id) {
+		serviceService.changeStatusToPending(id);
+		return ResponseEntity.ok("Estado modificado correctamente.");
+	}
 
 	@Operation(summary = "Obtiene todos los servicios pendientes por orden de creacion y estado pendiente")
 	@PreAuthorize("hasRole('ADMIN')")
