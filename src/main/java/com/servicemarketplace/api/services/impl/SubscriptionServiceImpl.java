@@ -1,8 +1,11 @@
 package com.servicemarketplace.api.services.impl;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -129,8 +132,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         Subscription savedSubscription = subscriptionRepository.save(subscription);
 
-        OffsetDateTime startDate = OffsetDateTime.now();
-        OffsetDateTime endDate = startDate.plusYears(1);
+        Instant startInstant = Instant.now().plusSeconds(120);
+        Instant endInstant = startInstant.plus(365, ChronoUnit.DAYS);
+
+        OffsetDateTime startDate = OffsetDateTime.ofInstant(startInstant, ZoneOffset.UTC);
+        OffsetDateTime endDate = OffsetDateTime.ofInstant(endInstant, ZoneOffset.UTC);
 
         PreApprovalAutoRecurringCreateRequest preapprovalAutoRecurring =
             PreApprovalAutoRecurringCreateRequest.builder()
@@ -159,7 +165,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             //SandboxInitPoint es para desarrollo, para prod usar InitPoint
             return response.getInitPoint();
         }catch (MPApiException e) {
-            System.out.println("Error de API: " + e.getApiResponse().getContent());
+            System.out.println("STATUS: " + e.getApiResponse().getStatusCode());
+            System.out.println("CONTENT: " + e.getApiResponse().getContent());
+            e.printStackTrace();
             return null;
         }catch (MPException e) {
             System.out.println("Error : " + e);
