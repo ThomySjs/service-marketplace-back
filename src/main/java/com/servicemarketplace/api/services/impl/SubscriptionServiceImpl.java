@@ -34,6 +34,7 @@ import com.servicemarketplace.api.domain.repositories.TransactionRepository;
 import com.servicemarketplace.api.domain.repositories.UserRepository;
 import com.servicemarketplace.api.dto.transaction.SubscriptionDTO;
 import com.servicemarketplace.api.dto.transaction.SubscriptionResponseDTO;
+import com.servicemarketplace.api.exceptions.auth.InvalidOperationException;
 import com.servicemarketplace.api.exceptions.auth.ResourceNotFoundException;
 import com.servicemarketplace.api.services.ServiceService;
 import com.servicemarketplace.api.services.SubscriptionService;
@@ -116,6 +117,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
         if (user == null || membership.isEmpty()) {
             throw new ResourceNotFoundException("Usuario o membresía no encontrado.");
+        }
+
+        if (user.getRole().equals(Roles.PREMIUM.name())) {
+            throw new InvalidOperationException("El usuario ya cuenta con una suscripcion activa.");
         }
         Membership foundMembership = membership.get();
 
