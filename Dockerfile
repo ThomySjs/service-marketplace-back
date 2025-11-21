@@ -1,14 +1,9 @@
-# Imagen base con Java 24 y bash disponible
-FROM eclipse-temurin:24-jdk
-
-# Directorio de trabajo
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Copiamos el JAR de la aplicación
-COPY target/service-marketplace-back-0.0.1-SNAPSHOT.jar app.jar
-
-# Exponemos el puerto de la app
-EXPOSE 8000
-
-# Comando para arrancar la app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM eclipse-temurin:21
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+CMD ["java", "-jar", "app.jar"]
