@@ -6,8 +6,9 @@ import org.springframework.stereotype.Component;
 import lombok.Data;
 
 @Component
+@ConfigurationProperties(prefix = "brevo")
 @Data
-@ConfigurationProperties(prefix = "mails")
-public class MailConfig {
-    private boolean enabled;
+public class BrevoConfig {
+    private String defaultSender;
+    private String apiKey;
 }
