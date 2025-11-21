@@ -59,6 +59,7 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject("Confirmación de Correo Electrónico");
             MimeMessageHelper helper;
             helper = new MimeMessageHelper(message, true);
+            helper.setFrom("servicemarketplace1@gmail.com");
             helper.setTo(to);
             helper.setText(processedString, true);
             mailSender.send(message);

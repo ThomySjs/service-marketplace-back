@@ -118,6 +118,11 @@ public class UserServiceImpl implements UserService {
         }
 
         User foundUser = user.get();
+        User contextUser = getUserFromContext();
+
+        if (foundUser.getEmail() == contextUser.getEmail()) {
+            throw new IllegalQueryOperationException("No puedes cambiar tu propio rol");
+        }
 
         if (foundUser.isAdmin()) {
             foundUser.setRole(Roles.USER.name());
