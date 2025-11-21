@@ -13,6 +13,7 @@ import org.thymeleaf.context.Context;
 
 import com.servicemarketplace.api.config.JwtUtils;
 import com.servicemarketplace.api.config.TokenTypes;
+import com.servicemarketplace.api.config.CustomConfig.MailConfig;
 import com.servicemarketplace.api.services.EmailService;
 
 import jakarta.mail.MessagingException;
@@ -28,6 +29,7 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
     private final JwtUtils jwtUtils;
+    private final MailConfig mailConfig;
 
     private final String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
@@ -59,7 +61,7 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject("Confirmación de Correo Electrónico");
             MimeMessageHelper helper;
             helper = new MimeMessageHelper(message, true);
-            helper.setFrom("servicemarketplace1@gmail.com");
+            helper.setFrom(mailConfig.getDefaultSender());
             helper.setTo(to);
             helper.setText(processedString, true);
             mailSender.send(message);

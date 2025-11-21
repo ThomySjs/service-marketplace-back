@@ -11,5 +11,6 @@ import lombok.Data;
 public class MailConfig {
 
     private boolean enabled;
+    private String defaultSender;
 
 }
