@@ -43,7 +43,9 @@ public class User {
     private boolean verified = false;
     @Builder.Default
     private String role = Roles.USER.name();
+    @Column(columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime createdAt;
+    @Column(nullable = true)
     private Long zoneId;
     @OneToMany(mappedBy = "seller", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Service> services;

@@ -211,7 +211,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.deleted = false
               AND s.disabled = false
               AND s.seller.role = 'PREMIUM'
-              ORDER BY function('RAND')
+              ORDER BY function('RANDOM')
        """)
        Page<ServiceListResponse> getRandomFeaturedServices(Pageable pageable);
 
@@ -228,7 +228,7 @@ public interface ServiceRepository extends JpaRepository<Service, Long> {
               AND s.deleted = false
               AND s.disabled = false
               AND s.seller.role != 'PREMIUM'
-              ORDER BY function('RAND')
+              ORDER BY function('RANDOM')
        """)
        Page<ServiceListResponse> getRandomServices(Pageable pageable);
 

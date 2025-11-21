@@ -32,6 +32,7 @@ public class RefreshToken {
     private String token;
     @Builder.Default
     private boolean revoked = false;
+    @Column(columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime createdAt;
     @Builder.Default
     private String session = UUID.randomUUID().toString();

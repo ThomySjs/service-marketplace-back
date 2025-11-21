@@ -30,7 +30,7 @@ public class RecoveryCode {
     @Column(nullable = false, unique = true)
     private String email;
     private boolean deleted;
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime createdAt;
 
     @PrePersist

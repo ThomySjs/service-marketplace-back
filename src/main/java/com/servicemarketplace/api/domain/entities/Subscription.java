@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.servicemarketplace.api.config.SubscriptionState;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,6 +38,7 @@ public class Subscription {
     private Membership membership;
     @Builder.Default
     private String state = SubscriptionState.INACTIVE.name();
+    @Column(columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime endDate;
 
 }

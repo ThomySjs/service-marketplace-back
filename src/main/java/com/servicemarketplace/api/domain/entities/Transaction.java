@@ -36,6 +36,7 @@ public class Transaction {
     @Builder.Default
     private Double total = 0.0;
     private String state;
+    @Column(columnDefinition = "TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)")
     private LocalDateTime date;
 
     @PrePersist
