@@ -2,6 +2,7 @@ package com.servicemarketplace.api.services.impl;
 
 import java.util.Optional;
 
+import org.hibernate.query.IllegalQueryOperationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
