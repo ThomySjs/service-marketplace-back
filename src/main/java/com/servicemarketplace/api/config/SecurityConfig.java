@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.servicemarketplace.api.config.CustomConfig.UrlConfig;
 import com.servicemarketplace.api.domain.entities.RefreshToken;
 import com.servicemarketplace.api.domain.repositories.RefreshTokenRepository;
 
@@ -37,6 +38,7 @@ public class SecurityConfig
 	private final AuthenticationProvider authenticationProvider;
     private final JwtUtils jwtUtils;
     private final RefreshTokenRepository refreshTokenRepository;
+	private final UrlConfig urlConfig;
 
 
 	@Bean
@@ -72,7 +74,7 @@ public class SecurityConfig
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.0.16:5173", "https://dudley-balanceable-tomas.ngrok-free.dev"));
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://192.168.0.16:5173", urlConfig.getFrontendUrl()));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowCredentials(true);
