@@ -40,9 +40,8 @@ public class ApiApplication implements CommandLineRunner {
 	}
 
 	private void createDefaultAdmin() {
-		if (userRepository.findByEmail(defaultUserConfig.getEmail()).get().equals(null)) {
+		if (userRepository.findByEmail(defaultUserConfig.getEmail()).isEmpty()) {
 			System.out.println("Creando usuario admin");
-			System.out.println(defaultUserConfig.getPassword());
 			User admin = User.builder()
 				.name(defaultUserConfig.getName())
 				.password(passwordEncoder.encode(defaultUserConfig.getPassword()))
